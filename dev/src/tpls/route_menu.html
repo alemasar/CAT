@@ -1,0 +1,11 @@
+<aside class="c-route-menu__links-menu" data-type="module-links">
+    <nav>
+        <ul>
+            {%for route in routes %}
+                <li>
+                    <a href="#" data-route-id="{{route.id}}" data-route-template="{{route.template}}" data-route-data="{{route.data}}" data-route-data_name="{{route.data_name}}">{{route.label}}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</aside>

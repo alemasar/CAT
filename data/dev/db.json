@@ -1,0 +1,29 @@
+{
+    "routes": [
+        {
+            "template": "route_menu.html",
+            "path": "./tpls",
+            "children": [
+                {
+                    "id":"home",
+                    "label":"Home",
+                    "template": "route_home.html",
+                    "path": "../../../src/tpls",
+                    "data": "service1",
+                    "data_name": "object1",
+                    "default": true,
+                    "css":"dist/css/header-module.css"
+                },
+                {
+                    "id":"test",
+                    "label":"Test",
+                    "template": "another_route.html",
+                    "path": "../../../src/tpls",
+                    "data": "service1",
+                    "data_name": "object",
+                    "css":"dist/css/header-module.css"
+                }
+            ]
+        }
+    ]
+}

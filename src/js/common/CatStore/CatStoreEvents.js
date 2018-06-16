@@ -1,78 +1,84 @@
+import CatStore from './CatStore';
 import Utils from '../utils';
 
-export default class CatStoreEvents {
+export default class CatStoreEvents extends CatStore{
     constructor () {
-        this.store = {};
-
-/*        const listStoreEvents = [];
-
-        const realAddEventListener = document.addEventListener;
-        
-        document.addEventListener = (evtType, fn, cap) => {
-            const events = Object.keys(listStoreEvents);
-            console.log("hola")
-            if (!(evtType in events)){
-                listStoreEvents.push(
-                    {on: this, type: evtType, handler: fn, capture: cap}
-                );
-            }
-
-            if (evtType === 'cat-get-store'){
-                console.log("cat-get-store")
-            }
-       
-            return realAddEventListener(this, arguments);
-        };*/
-
+        super();
+        this.modules = new Map();
+        this.initInterceptEvents();
+        this.initGetEvent();
+        this.initSetEvent();
     }
+
+    initInterceptEvents () {
+        const addEventListener = document.addEventListener;
+        const launched = [];
+        launched['cat-set-store'] = false;
+        launched['cat-get-store'] = false;
+        document.addEventListener = function(evtType,fn,cap) {
+            let launchEvent = false;
+            if (evtType === 'cat-set-store' || evtType === 'cat-get-store'){
+                /*let allModules = new Map();
+                const func = function (e) {  
+                    allModules = this;
+                }
+                Utils.triggerEvent('cat-get-store', { action: func });
+                const keys = Object.keys(allModules);*/
+console.log(launched)
+                if (!launched[evtType]){
+                    launched[evtType] = true;
+                    launchEvent = true;
+                } else {
+                    document.removeEventListener(evtType, fn, false);
+                }
+            }else if (evtType === 'DOMContentLoaded'){
+                console.log(evtType)
+            }else{
+                launchEvent = true;
+            }
+        
+            if (launchEvent){
+                console.log(this)
+                return addEventListener.apply(this, arguments);
+            }
+        }   
+    }
+
     initGetEvent () {
         const getObjHandler = (e) => {
-            e.detail.action.call(this.store);
+            console.log(this.modules)
+            e.detail.action.call(this.modules);
         }
         document.addEventListener('cat-get-store', getObjHandler);
     }
 
     initSetEvent () {
-        const setObjHandler = (e) => {     
-            this.store = e.detail.store;
+        const setObjHandler = (e) => {
+            let allModules = new Map();
+            const func = function(e) {
+                console.log(this)
+                allModules = this;
+            }
+            Utils.triggerEvent("cat-get-store", { action: func.bind(this.modules) })
+            allModules.set(e.detail.module.id, e.detail.module);
+            this.modules = allModules;
         }
+    
         document.addEventListener('cat-set-store', setObjHandler);
     }
 
-    updateModules(modules){
-        /*let keys = [];
-        let store;
-        const func = () => {
-            console.log(this)
-            store = this.store;
-        }
-        Utils.triggerEvent('cat-get-store', { action: func })
-        keys = Object.keys(store);
-        keys.forEach((key) => {
-            console.log(key)
-            modules.set(key,store.get(key))
-        })*/
-    }
+}
+/*  
+const modules = new Map();
 
-    getModules (modules) {
-        console.log(this.store);
-        this.updateModules(modules)
-        console.log(modules);
-        Utils.triggerEvent('cat-set-store', { store: modules })
+const setObjHandler = (e) => {
+    let allModules = new Map();
+    const func = function(e) {
+        allModules = this;
     }
-    setModules (modules) {
-        // this.store = modules;
-        console.log(this.store);
-        const func = () => {
-            console.log(modules)
-            this.store = modules;
-        }
-        Utils.triggerEvent('cat-set-store', {store: modules})
-    }
+    Utils.triggerEvent("cat-get-store", { action: func.bind(modules) })
+    console.log(allModules);
+    allModules.set(e.detail.modules.id, e.detail.modules);
 }
-/*
-const getObjHandler = (e) => {
-    console.log(this)
-    e.detail.action.call(this);
-}
-document.addEventListener('cat-get-store', getObjHandler);*/
+
+document.addEventListener('cat-set-store', setObjHandler);*/

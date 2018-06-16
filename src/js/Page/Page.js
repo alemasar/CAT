@@ -17,7 +17,7 @@ export default class Page {
     constructor () {
         this.id = 'prova';
         this.type = 'Page';
-        this.url = 'templateHTML.html';
+        this.url = 'template/templateHTML.html';
 //        this.page = new Proxy(protos, this.getProxy());
     }
 

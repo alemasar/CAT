@@ -21,7 +21,7 @@ export default class Header{
         this.class = '';
         this.tagName = '';
         this.type = 'Header';
-        this.templateUrl = 'templateHeaderHTML.html';
+        this.url = 'template/templateHeaderHTML.html';
         this.templatePath = '';
     }
 /*

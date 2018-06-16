@@ -1,13 +1,28 @@
-import CatStore from './CatStore/CatStore';
+import CatStoreEvents from './CatStore/CatStoreEvents';
+import Utils from './utils';
 
 export default class Cat {
     static bootstrap(type) {
 
         // this.store = new CatStore();
+        const store = new CatStoreEvents();
+        const module = new type();
+        store.addModule(module);
+        console.log(store.modules)
 
-        CatStore.addModule(type)
+        let allModules = new Map();
+        const func = function(e) {
+            console.log(this)
+            allModules = this;
+        }
+        Utils.triggerEvent("cat-get-store", { action: func })
         const protos = new Map();
         const config = new Map();
+        console.log(`dist/tpls/${module.type}/${module.url}`)
+        import(`../../../dist/tpls/${module.type}/${module.url}`).then((code) => {
+            console.log(code)
+        })
+
        // console.log(this.store);
         /*protos.set('template', new TemplateMethods());
         protos.set('config', new ConfigMethods());

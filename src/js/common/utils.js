@@ -31,17 +31,24 @@ export default class Utils {
         }
         document.dispatchEvent(event);
     }
-    static getProxy(persistFunc){
-        let t = [];
+    static getProxy(module){
         const mh = {
-            get: function (dummyTarget, trapName) {
+            get: (target, prop, receiver) => {
+                console.log('--------------- GET UTILS ---------------');
+                console.log(this);
+                console.log(prop);
+                //  persistFunc();
+        
+                return target;
+            },
+            set: (dummyTarget, trapName) =>{
+                console.log('--------------- SET UTILS ---------------');
                 console.log(dummyTarget);
-                persistFunc();
-                return Reflect[trapName];
+                console.log(trapName); 
             }
         }
-        const dummy = {};
+        const dummy = new Map();
         const bh = new Proxy(dummy, mh);
-        return new Proxy(t, bh);
+        return new Proxy(new Map(), mh);
     }
 }

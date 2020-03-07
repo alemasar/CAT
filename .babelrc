@@ -1,8 +1,5 @@
-
 {
-  "presets": ["env", "stage-0"],
-  "sourceMaps": true,
-  "plugins": [
-    "transform-object-rest-spread"
+  "presets": [
+    "@babel/preset-env"
   ]
 }

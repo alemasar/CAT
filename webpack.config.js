@@ -1,100 +1,91 @@
-const webpack = require("webpack");
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const glob = require("glob");
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const babelPolyfill = require("babel-polyfill");
+/* eslint-disable no-undef */
 const path = require('path');
-const pjson = require('./package.json');
-// p['./dist/js/' + pjson.name + '.bundle.js'] = './src/js/main.js';
-var p = []
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniCSSExtract = require('mini-css-extract-plugin');
+const config = require('./src/index.cat.json');
+console.log(config["components-alias"]);
 
-p = ['babel-polyfill', './src/js/main.js'];
-// , './src/js/main-header.js'
+const alias = {};
 
-// p['./dist/js/dev/prova1.bundle.js'] = './src/js/dev/prova1.js';
-
-var css = {}
-css['./dist/css/' + pjson.name] = './src/sass/' + pjson.name + '.scss';
-
-const extractStyles = (loaders) => {
-    return ExtractTextPlugin.extract({
-        use: loaders
-    });
-};
-
-const bundles = ["main", "main-header"]
-const js = [];
-let entries = ["babel-polyfill"]
-bundles.forEach((bundle) =>{
-    entries.push("./src/js/"+bundle+".js")
-    js.push({
-        entry: entries,
-        output: {
-            //  path: path.resolve(__dirname),
-            //  pathinfo: true,
-            filename: "./dist/js/"+bundle+".bundle.js"
-            //  chunkFilename: "./dist/js/[name].bundle.js"
-        },
-        devtool: 'source-map',
-        module: {
-            rules: [
-                {
-                    test: /\.js$/,
-                    exclude: /node_modules/,
-                    use: 'babel-loader'
-                }
-            ]
-        },
-        plugins: [
-            new CopyWebpackPlugin([
-                {
-                    from: './**/*.html',
-                    to: 'dist/js/[path]/[name].html',
-                    context: 'src/js'
-                }
-            ]),
-        ]
-    })
-    entries = []
+Object.keys(config["components-alias"]).forEach((alias_key) => {
+  alias[alias_key]=path.resolve(__dirname, "src/" + config["components-alias"][alias_key]);
 })
 
-module.exports = [
-    ...js,
-    {
-        entry: css,
-        output: {
-            path: path.resolve(__dirname),
-            pathinfo: true,
-            filename: "[name].css"
+const basePath = __dirname;
+const distPath = 'dist';
+const indextInput = './src/index.html';
+const indexOutput = 'index.html';
+
+module.exports = {
+  mode: 'development',
+  resolve: {
+    extensions: ['.js'],
+    alias: alias
+  },
+  entry: {
+    app: ['@babel/polyfill', './src/cat/index.js'],
+  },
+  output: {
+    path: path.join(basePath, distPath),
+    filename: '[chunkhash][name].js'
+  },
+  module: {
+    rules: [
+
+      {
+        test: /\.(cat)$/,
+        use: {
+          loader: path.resolve('./cat-loader/index.js'),
+          options: {
+            context: path.join(__dirname, "src"),
+            public: path.join(__dirname, "public"),
+            //			  name: '[name].[ext]',
+            //			  useRelativePath: true,
+            //			  outputPath: '../dist/',
+            //			  publicPath: '../images/'
+          }
         },
-        devtool: 'source-map',
-        module: {
-            rules: [
-                {
-                    test: /\.scss$/,
-                    use: extractStyles(['css-loader', 'sass-loader'])
-                },
-                {
-                    test: /\.css$/,
-                    use: extractStyles(['css-loader'])
-                }
-            ]
-        },
-        plugins: [
-            new ExtractTextPlugin({ // define where to save the file
-                filename: "[name].css",
-                allChunks: true
-            }),
-            new webpack.HotModuleReplacementPlugin()
+      },
+      {
+        test: /\.js/,
+        exclude: /node_modules/,
+        use: ['babel-loader', 'eslint-loader',]
+      },
+      {
+        test: /\.css/,
+        exclude: /node_modules/,
+        use: [
+          MiniCSSExtract.loader,
+          'css-loader',
         ],
-        devServer: {
-            contentBase: './',
-            historyApiFallback: true,
-            inline: true,
-            overlay: {
-                errors: true,
-                warnings: true,
-            }
-        }
-    }
-]
+      },
+      {
+        test: /\.scss$/,
+        loader: [
+          MiniCSSExtract.loader,
+          "css-loader",
+          "sass-loader"
+        ]
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              // outputPath: 'images/',
+              // publicPath: 'images/',
+            },
+          },
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new HTMLWebpackPlugin(),
+    new MiniCSSExtract({
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+    })
+  ]
+};

@@ -1,0 +1,9 @@
+{
+  "components-alias": {
+    "COMPONENTS":"components",
+    "VIEWS":"views"
+  },
+  "main-scss": [
+    "scss/main.scss"
+  ]
+}

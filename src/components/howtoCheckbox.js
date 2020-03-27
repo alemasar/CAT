@@ -1,4 +1,4 @@
-const KEYCODE = {
+/*const KEYCODE = {
   SPACE: 32,
 };
 
@@ -124,4 +124,4 @@ export default class HowToCheckbox extends HTMLElement {
       bubbles: true,
     }));
   }
-}
+}*/

@@ -1,22 +1,21 @@
 import instance from "./src/classes/Singleton";
+import "@webcomponents/webcomponentsjs/webcomponents-bundle.js";
 import "@webcomponents/webcomponentsjs/webcomponents-loader.js";
-
-let first = instance;
-let second = instance;
-console.log(first===second);
-
-function component() {
-  const element = document.createElement('div');
-
-  element.innerHTML = '<hola-mundo></hola-mundo><adios-mundo></adios-mundo>';
-
-  return element;
+import "@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js";
+window.addEventListener('popstate', function () {
+  console.log("EYYYYYYY")
+});
+//window.onpopstate = function() {alert(1);};
+const loadComponents = async (components) => {
+  for (let cmp of components) {
+    await import(`COMPONENTS/lib/${cmp}`);
+  }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("viewLoaded", () => {
   //console.log(WebComponents)
   // eslint-disable-next-line no-undef
-  WebComponents.waitFor(() => {
+  WebComponents.waitFor(async () => {
     // At this point we are guaranteed that all required polyfills have
     // loaded, and can use web components API's.
     // The standard pattern is to load element definitions that call
@@ -24,9 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Note: returning the import's promise causes the custom elements
     // polyfill to wait until all definitions are loaded and then upgrade
     // the document in one batch, for better performance.
-    import("COMPONENTS/HolaMundo");
-    import("COMPONENTS/AdiosMundo");
+    const components = instance.getAll();
+    console.log(instance.getAll());
+    await loadComponents(components);
+    console.log(customElements.get('chess-board'))
+    //document.body.innerHTML = '<a href="#" onclick="history.pushState({page: 1}, "title 1", "/news");">Home</a>';
+    //history.pushState({}, '/news', '/news');
+    //    history.pushState({}, document.title, "/news");
   });
-  document.body.appendChild(component());
-
+  //  document.body.appendChild(component());
 })

@@ -1,0 +1,20 @@
+{
+  "cat-config": {
+    "components-alias": {
+      "COMPONENTS": "components",
+      "VIEWS": "views",
+      "CATSRC": "cat/src"
+    },
+    "main-scss": []
+  },
+  "cat-router": {
+    "index": {
+      "path": "/",
+      "view": "index.html"
+    },
+    "news": {
+      "path": "/news",
+      "view": "news.html"
+    }
+  }
+}

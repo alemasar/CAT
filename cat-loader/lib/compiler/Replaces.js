@@ -1,11 +1,21 @@
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard");
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
 var fs = _interopRequireWildcard(require("fs"));
 
@@ -13,43 +23,76 @@ var _path = _interopRequireDefault(require("path"));
 
 var _Compiler = _interopRequireDefault(require("./Compiler"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
+/* eslint-disable */
 var Replaces = /*#__PURE__*/function () {
   function Replaces() {
-    _classCallCheck(this, Replaces);
+    (0, _classCallCheck2["default"])(this, Replaces);
   }
 
-  _createClass(Replaces, [{
+  (0, _createClass2["default"])(Replaces, [{
     key: "replaceJson",
     value: function replaceJson(src, json) {
-      return JSON.stringify(json);
+      return new Promise(function (resolve, reject) {
+        resolve(JSON.stringify(json));
+      });
     }
   }, {
     key: "replaceRoutes",
-    value: function replaceRoutes(src, json, alias) {
-      var routerKeys = Object.keys(json);
-      var router = "";
-      routerKeys.forEach(function (k) {
-        router += "if (\"".concat(json[k].path, "\" === this.url.pathname){\n       const template = await import(`VIEWS/").concat(json[k].view, "`);");
-        var view = fs.readFileSync(_path["default"].join(src + "/" + alias.VIEWS, "./" + json[k].view), "utf8").toString();
-        router += _Compiler["default"].getTemplateImports(src, alias, view);
-        router += "console.log(template.default);document.getElementById(\"app\").innerHTML = document.getElementById(\"app\").innerHTML + template.default;\n     }";
-      });
-      return router;
-    }
-  }]);
+    value: function () {
+      var _replaceRoutes = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(src, json, alias) {
+        var routerKeys, router, _i, _routerKeys, k, view, route;
 
+        return _regenerator["default"].wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                routerKeys = Object.keys(json);
+                router = "";
+                _i = 0, _routerKeys = routerKeys;
+
+              case 3:
+                if (!(_i < _routerKeys.length)) {
+                  _context.next = 15;
+                  break;
+                }
+
+                k = _routerKeys[_i];
+                router += "if (\"".concat(json[k].path, "\" === this.url.pathname){\n       const template = await import(`VIEWS/").concat(json[k].view, "`);");
+                view = fs.readFileSync(_path["default"].join(src + "/" + alias.VIEWS, "./" + json[k].view), "utf8").toString();
+                _context.next = 9;
+                return _Compiler["default"].getTemplateImports(src, alias, view);
+
+              case 9:
+                route = _context.sent;
+                router += route;
+                router += "console.log(template.default);document.getElementById(\"app\").innerHTML = document.getElementById(\"app\").innerHTML + template.default;\n     }";
+
+              case 12:
+                _i++;
+                _context.next = 3;
+                break;
+
+              case 15:
+                ;
+                return _context.abrupt("return", new Promise(function (resolve, reject) {
+                  resolve(router);
+                }));
+
+              case 17:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+
+      function replaceRoutes(_x, _x2, _x3) {
+        return _replaceRoutes.apply(this, arguments);
+      }
+
+      return replaceRoutes;
+    }()
+  }]);
   return Replaces;
 }();
 

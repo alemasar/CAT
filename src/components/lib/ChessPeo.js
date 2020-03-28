@@ -1,4 +1,9 @@
-const template = document.createElement("template");template.innerHTML =`<style></style>`;class ChessPeo extends HTMLElement {
+const template = document.createElement("template");
+      template.innerHTML =`<style>
+      
+      </style>
+      `;
+class ChessPeo extends HTMLElement {
   constructor() {
     super();
     console.log("PASSSO");

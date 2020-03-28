@@ -10,12 +10,16 @@ class Router {
     return Compiler.compile(src, router, args);
   }
 }
-export default function loader(input, map, meta) {
+
+module.exports = function loader(input, map, meta) {
   const webpack = this;
   const options = getOptions(this) || {};
   const callback = this.async();
   const config_json = JSON.parse(input);
 
   webpack.clearDependencies();
-  callback (null, Router.getRouter(options.context, { json: config_json["cat-router"], alias: config_json["cat-config"]["components-alias"] }));
+  Router.getRouter(options.context, { json: config_json["cat-router"], alias: config_json["cat-config"]["components-alias"] }).then(code=>{
+    callback (null, code);
+  });
+  return;
 }

@@ -1,18 +1,16 @@
 /* eslint-disable */
-/*
-
-  <style>
-    .chess-board_container{
-      background-color:#000;
+<style>
+  .chess-board_container{
+    background-color:#000;
       width:300px;
       height:300px;
     }
-    </style>
+</style>
 <template>
-  <div class="chess-board_container">
-  </div>
+    <div class="chess-board_container">
+    </div>
 </template>
-*/
+
 class ChessBoard extends HTMLElement {
   constructor() {
     super();

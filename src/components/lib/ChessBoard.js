@@ -1,27 +1,15 @@
-const template = document.createElement("template");template.innerHTML =`<style>
-    .chess-board_container{
-      background-color:#000;
-      width:300px;
-      height:300px;
-    }
-    </style>
-  <div class="chess-board_container">
-  </div>
-`;/* eslint-disable */
-/*
+const template = document.createElement("template");
+      template.innerHTML =`<style>
+      .chess-board_container {
+  background-color: #000;
+  width: 300px;
+  height: 300px; }
 
-  <style>
-    .chess-board_container{
-      background-color:#000;
-      width:300px;
-      height:300px;
-    }
-    </style>
-<template>
-  <div class="chess-board_container">
-  </div>
-</template>
-*/
+      </style>
+      
+    <div class="chess-board_container">
+    </div>
+`;
 class ChessBoard extends HTMLElement {
   constructor() {
     super();
@@ -32,3 +20,4 @@ class ChessBoard extends HTMLElement {
   }
 }
 customElements.define('chess-board', ChessBoard);
+

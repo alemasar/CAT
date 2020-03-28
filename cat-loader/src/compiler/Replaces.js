@@ -5,20 +5,25 @@ import Compiler from "./Compiler";
 
 class Replaces {
   replaceJson(src, json) {
-    return JSON.stringify(json);
+    return new Promise((resolve, reject) => {
+      resolve(JSON.stringify(json));
+    });
   }
-  replaceRoutes(src, json, alias) {
+  async replaceRoutes(src, json, alias) {
     const routerKeys = Object.keys(json);
     let router = "";
-    routerKeys.forEach(k => {
+    for (const k of routerKeys) {
       router += `if ("${json[k].path}" === this.url.pathname){
        const template = await import(\`VIEWS/${json[k].view}\`);`;
       const view = fs.readFileSync(path.join(src + "/" + alias.VIEWS, "./" + json[k].view), "utf8").toString();
-      router += Compiler.getTemplateImports(src,alias,view);
+      const route = await Compiler.getTemplateImports(src,alias,view);
+      router += route;
       router += `console.log(template.default);document.getElementById("app").innerHTML = document.getElementById("app").innerHTML + template.default;
      }`;
+    };
+    return new Promise((resolve, reject) => {
+      resolve(router);
     });
-    return router;
   }
 }
 

@@ -11,10 +11,6 @@
     "index": {
       "path": "/",
       "view": "index.html"
-    },
-    "news": {
-      "path": "/news",
-      "view": "news.html"
     }
   }
 }

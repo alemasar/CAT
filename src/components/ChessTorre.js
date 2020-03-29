@@ -4,8 +4,8 @@
     justify-content:center;
     position:absolute;
   }
-  .chess-peo{
-    background-image: image-url("peo-negra.svg");
+  .chess-torre{
+    background-image: image-url("torre-negra.svg");
     background-repeat:no-repeat;
     background-size:60px 60px;
     width:60px;
@@ -13,11 +13,11 @@
   }
 </style>
 <template>
-    <div class="chess-peo">
+    <div class="chess-torre">
     </div>
 </template>
 
-class ChessPeo extends HTMLElement {
+class ChessTorre extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -25,4 +25,4 @@ class ChessPeo extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 }
-customElements.define('chess-peo', ChessPeo);
+customElements.define('chess-torre', ChessTorre);

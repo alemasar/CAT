@@ -1,4 +1,4 @@
-import instance from "./src/classes/Singleton";
+import instance from "./src/classes/instance";
 import "@webcomponents/webcomponentsjs/webcomponents-bundle.js";
 import "@webcomponents/webcomponentsjs/webcomponents-loader.js";
 import "@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js";

@@ -3,7 +3,9 @@
     "components-alias": {
       "COMPONENTS": "components",
       "VIEWS": "views",
-      "CATSRC": "cat/src"
+      "CATSRC": "cat/src",
+      "ASSETS": "src/img",
+      "CHESSLOGIC": "chess"
     },
     "main-scss": []
   },

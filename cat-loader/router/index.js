@@ -1,4 +1,4 @@
-import instance from "CATSRC/classes/Singleton";
+import instance from "CATSRC/classes/instance";
 /** write json ejecuta replaceJson con el parametro json **/
 /** write routes ejecuta replaceRoutes con los parametros json, alias **/
 

@@ -6,8 +6,8 @@ const template = document.createElement("template");
   justify-content: center;
   position: absolute; }
 
-.chess-peo {
-  background-image: url('src/img/peo-negra.svg');
+.chess-alfil {
+  background-image: url('src/img/alfil-negra.svg');
   background-repeat: no-repeat;
   background-size: 60px 60px;
   width: 60px;
@@ -15,10 +15,10 @@ const template = document.createElement("template");
 
       </style>
       
-    <div class="chess-peo">
+    <div class="chess-alfil">
     </div>
 `;
-class ChessPeo extends HTMLElement {
+class ChessAlfil extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -26,4 +26,4 @@ class ChessPeo extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 }
-customElements.define('chess-peo', ChessPeo);
+customElements.define('chess-alfil', ChessAlfil);

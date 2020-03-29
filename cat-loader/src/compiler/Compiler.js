@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import path from "path";
 import sass from "node-sass";
 import Replaces from "./Replaces";
+import assetFunctions from "node-sass-asset-functions";
 
 class Compiler {
   static async compile(src, file, args) {
@@ -40,13 +41,18 @@ class Compiler {
     }
     return file;
   }
-  static getCss(styles) {
+  static getCss(styles,alias) {
     return new Promise((resolve, reject) => {
       sass.render(
         {
+          functions: assetFunctions({
+            images_path: alias.ASSETS,
+            http_images_path: alias.ASSETS
+          }),
           data: styles
         },
         (err, result) => {
+          console.log(err)
           const css = result.css.toString();
           /* this.searchImages(css, inputs.json.basePath, inputs.webpack)
            resolve(css);*/
@@ -56,13 +62,13 @@ class Compiler {
       );
     });
   }
-  static async getComponentCss(componentTemplate) {
+  static async getComponentCss(componentTemplate, alias) {
     const stylePos = componentTemplate.indexOf("<style>");
     let styles = "";
     let css = "";
     if (stylePos !== -1) {
       styles = componentTemplate.substring(stylePos, componentTemplate.indexOf("</style>")).replace("<style>", "");
-      css = Compiler.getCss(styles);
+      css = Compiler.getCss(styles, alias);
     }
     return new Promise((resolve, reject) => {
       resolve(css);
@@ -100,7 +106,16 @@ class Compiler {
     })
     return classCode;
   }
-
+  static getClassImports(component){
+    let classImports = "";
+    const classSplitted = component.split("\n");
+    classSplitted.forEach(line => {
+      if (line.indexOf("import") === 0) {
+        classImports += `${line}\n`;
+      }
+    });
+    return classImports;
+  }
   static async getTemplateImports(src, alias, template) {
     const fileArray = template.split("\n");
     let finalStringTemplate = ``;
@@ -119,7 +134,8 @@ class Compiler {
     console.log("start", imports);
     for (const importClass of imports) {
       const component = fs.readFileSync(path.join(src + "/" + alias.COMPONENTS, "./" + importClass + ".js"), "utf8").toString();
-      const css = await Compiler.getComponentCss(component);
+      const classImports = Compiler.getClassImports(component);
+      const css = await Compiler.getComponentCss(component, alias);
       const classCode = Compiler.getCodeClass(component);
       const stringTemplate = Compiler.getComponentTemplate(component)
       finalStringTemplate = `const template = document.createElement("template");
@@ -128,7 +144,7 @@ class Compiler {
       </style>
       ${stringTemplate}\`;`;
       console.log(finalStringTemplate);
-      Compiler.writeFileSyncRecursive(path.join(src + "/" + alias.COMPONENTS + "/lib", "./" + importClass + ".js"), finalStringTemplate + "\n" + classCode, "utf8");
+      Compiler.writeFileSyncRecursive(path.join(src + "/" + alias.COMPONENTS + "/lib", "./" + importClass + ".js"), classImports + "\n" + finalStringTemplate + "\n" + classCode, "utf8");
       importingClass += `instance.add("${importClass}");`;
     }
     console.log("end", imports);

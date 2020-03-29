@@ -25,6 +25,8 @@ var _nodeSass = _interopRequireDefault(require("node-sass"));
 
 var _Replaces = _interopRequireDefault(require("./Replaces"));
 
+var _nodeSassAssetFunctions = _interopRequireDefault(require("node-sass-asset-functions"));
+
 /* eslint-disable */
 var Compiler = /*#__PURE__*/function () {
   function Compiler() {
@@ -182,11 +184,16 @@ var Compiler = /*#__PURE__*/function () {
     }()
   }, {
     key: "getCss",
-    value: function getCss(styles) {
+    value: function getCss(styles, alias) {
       return new Promise(function (resolve, reject) {
         _nodeSass["default"].render({
+          functions: (0, _nodeSassAssetFunctions["default"])({
+            images_path: alias.ASSETS,
+            http_images_path: alias.ASSETS
+          }),
           data: styles
         }, function (err, result) {
+          console.log(err);
           var css = result.css.toString();
           /* this.searchImages(css, inputs.json.basePath, inputs.webpack)
            resolve(css);*/
@@ -199,7 +206,7 @@ var Compiler = /*#__PURE__*/function () {
   }, {
     key: "getComponentCss",
     value: function () {
-      var _getComponentCss = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(componentTemplate) {
+      var _getComponentCss = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(componentTemplate, alias) {
         var stylePos, styles, css;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
@@ -211,7 +218,7 @@ var Compiler = /*#__PURE__*/function () {
 
                 if (stylePos !== -1) {
                   styles = componentTemplate.substring(stylePos, componentTemplate.indexOf("</style>")).replace("<style>", "");
-                  css = Compiler.getCss(styles);
+                  css = Compiler.getCss(styles, alias);
                 }
 
                 return _context3.abrupt("return", new Promise(function (resolve, reject) {
@@ -226,7 +233,7 @@ var Compiler = /*#__PURE__*/function () {
         }, _callee3);
       }));
 
-      function getComponentCss(_x4) {
+      function getComponentCss(_x4, _x5) {
         return _getComponentCss.apply(this, arguments);
       }
 
@@ -273,10 +280,22 @@ var Compiler = /*#__PURE__*/function () {
       return classCode;
     }
   }, {
+    key: "getClassImports",
+    value: function getClassImports(component) {
+      var classImports = "";
+      var classSplitted = component.split("\n");
+      classSplitted.forEach(function (line) {
+        if (line.indexOf("import") === 0) {
+          classImports += "".concat(line, "\n");
+        }
+      });
+      return classImports;
+    }
+  }, {
     key: "getTemplateImports",
     value: function () {
       var _getTemplateImports = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(src, alias, template) {
-        var fileArray, finalStringTemplate, importingClass, imports, _i, _imports, importClass, component, css, classCode, stringTemplate;
+        var fileArray, finalStringTemplate, importingClass, imports, _i, _imports, importClass, component, classImports, css, classCode, stringTemplate;
 
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
@@ -301,36 +320,37 @@ var Compiler = /*#__PURE__*/function () {
 
               case 7:
                 if (!(_i < _imports.length)) {
-                  _context4.next = 22;
+                  _context4.next = 23;
                   break;
                 }
 
                 importClass = _imports[_i];
                 component = fs.readFileSync(_path["default"].join(src + "/" + alias.COMPONENTS, "./" + importClass + ".js"), "utf8").toString();
-                _context4.next = 12;
-                return Compiler.getComponentCss(component);
+                classImports = Compiler.getClassImports(component);
+                _context4.next = 13;
+                return Compiler.getComponentCss(component, alias);
 
-              case 12:
+              case 13:
                 css = _context4.sent;
                 classCode = Compiler.getCodeClass(component);
                 stringTemplate = Compiler.getComponentTemplate(component);
                 finalStringTemplate = "const template = document.createElement(\"template\");\n      template.innerHTML =`<style>\n      ".concat(css, "\n      </style>\n      ").concat(stringTemplate, "`;");
                 console.log(finalStringTemplate);
-                Compiler.writeFileSyncRecursive(_path["default"].join(src + "/" + alias.COMPONENTS + "/lib", "./" + importClass + ".js"), finalStringTemplate + "\n" + classCode, "utf8");
+                Compiler.writeFileSyncRecursive(_path["default"].join(src + "/" + alias.COMPONENTS + "/lib", "./" + importClass + ".js"), classImports + "\n" + finalStringTemplate + "\n" + classCode, "utf8");
                 importingClass += "instance.add(\"".concat(importClass, "\");");
 
-              case 19:
+              case 20:
                 _i++;
                 _context4.next = 7;
                 break;
 
-              case 22:
+              case 23:
                 console.log("end", imports);
                 return _context4.abrupt("return", new Promise(function (resolve, reject) {
                   resolve(importingClass);
                 }));
 
-              case 24:
+              case 25:
               case "end":
                 return _context4.stop();
             }
@@ -338,7 +358,7 @@ var Compiler = /*#__PURE__*/function () {
         }, _callee4);
       }));
 
-      function getTemplateImports(_x5, _x6, _x7) {
+      function getTemplateImports(_x6, _x7, _x8) {
         return _getTemplateImports.apply(this, arguments);
       }
 

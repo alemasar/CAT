@@ -14,7 +14,4 @@ class Singleton {
   }
 }
 
-const instance = new Singleton();
-Object.freeze(instance);
-
-export default instance;
+export default Singleton;

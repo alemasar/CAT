@@ -4,10 +4,13 @@ const template = document.createElement("template");
       :host {
   display: flex;
   justify-content: center;
-  position: absolute; }
+  position: relative; }
+  :host .negra {
+    background-image: url('src/img/rei-negra.svg'); }
+  :host .blanca {
+    background-image: url('src/img/rei-blanc.svg'); }
 
 .chess-rei {
-  background-image: url('src/img/rei-negra.svg');
   background-repeat: no-repeat;
   background-size: 60px 60px;
   width: 60px;
@@ -22,8 +25,15 @@ class ChessRei extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    // console.log(this.cat)
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+  }
+
+  connectedCallback() {
+    this.shadowRoot.querySelector(".chess-rei").classList.add(this.theme);
+  }
+  
+  get theme() {
+    return this.getAttribute('theme');
   }
 }
 customElements.define('chess-rei', ChessRei);

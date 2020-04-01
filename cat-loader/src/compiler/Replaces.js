@@ -18,7 +18,7 @@ class Replaces {
       const view = fs.readFileSync(path.join(src + "/" + alias.VIEWS, "./" + json[k].view), "utf8").toString();
       const route = await Compiler.getTemplateImports(src,alias,view);
       router += route;
-      router += `console.log(template.default);document.getElementById("app").innerHTML = document.getElementById("app").innerHTML + template.default;
+      router += `document.getElementById("app").innerHTML = document.getElementById("app").innerHTML + template.default;
      }`;
     };
     return new Promise((resolve, reject) => {

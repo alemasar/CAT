@@ -2,10 +2,15 @@
   :host{
     display:flex;
     justify-content:center;
-    position:absolute;
+    position:relative;
+    .negra{
+      background-image: image-url("cavall-negra.svg");
+    }
+    .blanca{
+      background-image: image-url("cavall-blanc.svg");
+    }
   }
   .chess-cavall{
-    background-image: image-url("cavall-negra.svg");
     background-repeat:no-repeat;
     background-size:60px 60px;
     width:60px;
@@ -21,8 +26,15 @@ class ChessCavall extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    // console.log(this.cat)
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+  }
+
+  connectedCallback() {
+    this.shadowRoot.querySelector(".chess-cavall").classList.add(this.theme);
+  }
+  
+  get theme() {
+    return this.getAttribute('theme');
   }
 }
 customElements.define('chess-cavall', ChessCavall);

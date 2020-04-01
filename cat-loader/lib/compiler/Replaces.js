@@ -65,7 +65,7 @@ var Replaces = /*#__PURE__*/function () {
               case 9:
                 route = _context.sent;
                 router += route;
-                router += "console.log(template.default);document.getElementById(\"app\").innerHTML = document.getElementById(\"app\").innerHTML + template.default;\n     }";
+                router += "document.getElementById(\"app\").innerHTML = document.getElementById(\"app\").innerHTML + template.default;\n     }";
 
               case 12:
                 _i++;

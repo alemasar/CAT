@@ -24,9 +24,7 @@ document.addEventListener("viewLoaded", () => {
     // polyfill to wait until all definitions are loaded and then upgrade
     // the document in one batch, for better performance.
     const components = instance.getAll();
-    console.log(instance.getAll());
     await loadComponents(components);
-    console.log(customElements.get('chess-board'))
     //document.body.innerHTML = '<a href="#" onclick="history.pushState({page: 1}, "title 1", "/news");">Home</a>';
     //history.pushState({}, '/news', '/news');
     //    history.pushState({}, document.title, "/news");

@@ -11,7 +11,6 @@ class Router{
     const viewLoaded = new Event('viewLoaded');
     /* write routes */
     document.dispatchEvent(viewLoaded);
-    console.log(instance.getAll())
   }
 }
 export default new Router(/* write json */);

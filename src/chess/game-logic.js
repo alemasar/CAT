@@ -35,8 +35,9 @@ export default class GameLogic {
     this.chessboard_pieces.forEach((y)=>{
       chessboard.add(y);
     });
-    game.add("movementStatus", 0);
-    game.add("movementPlayer", 0);
+//    game.movementStatus = 0;
+    game.set("movementStatus", 0);
+    game.set("movementPlayer", 0);
     //game.add("movementStatus", 0);  
   }
 

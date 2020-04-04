@@ -1,3 +1,5 @@
+//import game from "CHESSLOGIC/game-instance";
+
 <style>
   :host{
     display:flex;
@@ -15,13 +17,14 @@
 </template>
 
 class ChessBox extends HTMLElement {
+
   constructor() {
     super();
+    //this.game = game;
+    this.x = 0;
+    this.y = 0;
     this.shadowRoot = this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.loaded = new Promise((resolve)=>{
-      this.connectedCallback = resolve;
-    });
   }
 
   connectedCallback() {
@@ -37,22 +40,23 @@ class ChessBox extends HTMLElement {
 
   _onClick() {
     //const boxDiv = this.shadowRoot.querySelector(".chess-box");
-    console.log("CLICK BOX", this.x);
-    this.dispatchEvent(new CustomEvent("box-clicked", {
+    console.log("CLICK BOX", this.parent);
+    
+    /*this.parent.setAttribute('x', this.x);
+    this.parent.setAttribute('y', this.y);*/
+    this.parent.x = this.x;
+    this.parent.y = this.y;
+    this.parent.setAttribute('movement-status', 1);
+    /*this.dispatchEvent(new CustomEvent("box-clicked", {
       "detail": {"x":this.x,"y":this.y }
-    }));
+    }));*/
+   // console.log(this.game)
     /*
     boxDiv.style.border = "1px solid #ff0000";
     boxDiv.style.width = boxDiv.offsetWidth - 2 + "px";
     boxDiv.style.height = boxDiv.offsetHeight - 2 + "px";
     this.style.left = this.offsetLeft - 1 + "px";
     this.style.top = this.offsetTop - 1 + "px";*/
-  }
-  get x() {
-    return this.getAttribute('x');
-  }
-  get y() {
-    return this.getAttribute('y');
   }
 
 /*  disconnectedCallback() {

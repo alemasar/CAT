@@ -3,7 +3,7 @@ class SingletonObject {
     this._data = {};
   }
 
-  add(key, value) {
+  set(key, value) {
     this._data[key] = value;
   }
   getAll() {

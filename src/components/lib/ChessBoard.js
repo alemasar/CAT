@@ -1,3 +1,5 @@
+import chessboard from "CHESSLOGIC/chessboard-instance";
+import game from "CHESSLOGIC/game-instance";
 import ChessLogic from "CHESSLOGIC/game-logic";
 
 const template = document.createElement("template");
@@ -21,28 +23,33 @@ const template = document.createElement("template");
 class ChessBoard extends HTMLElement {
   constructor() {
     super();
-    this.chesslogic = new ChessLogic();
+    const initChessBoard = new ChessLogic();
+    console.log(initChessBoard);
+    this.chessboard = chessboard.getAll();
     this.contLoadedBoxes = 0;
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.locateBoxes();
+    console.log(chessboard.getAll());
+    console.log(game);
     //this.locatePieces();
   }
 
   locateBoxes() {
-    this.chesslogic.chessboard_pieces.forEach((x, ix) => {
+    console.log(this.chessboard)
+    this.chessboard.forEach((x, ix) => {
       x.forEach((y, iy) => {
         const box = document.createElement("chess-box");
-        box.style.top = y.top + "px";
-        box.style.left = y.left + "px";
+        box.style.top = y.pieceLogic.top + "px";
+        box.style.left = y.pieceLogic.left + "px";
         box.setAttribute("x", ix);
         box.setAttribute("y", iy);
-        box.addEventListener("box-clicked", (e)=> {
+/*        box.addEventListener("box-clicked", (e)=> {
           const x = e.detail.x;
           const y = e.detail.y;
           console.log(x+'   '+y)
-          if (this.chesslogic.chessboard_pieces[x][y].piece !==0){
-            const piece=this.chesslogic.chessboard_pieces[x][y].boxComponent.shadowRoot.querySelector("chess-peo")
+          if (this.chessboard[x][y].piece !==0){
+            const piece=this.chessboard[x][y].boxComponent.shadowRoot.querySelector("chess-peo")
             const canMove = this.chesslogic.checkMove(x, y, piece.getAttribute("direction"));
 console.log(x+"   "+y)
             if (canMove){
@@ -52,9 +59,9 @@ console.log(x+"   "+y)
               this.chesslogic.chessboard_pieces[x][parseInt(y) + parseInt(piece.getAttribute("direction"))].piece=1;
             }
           }         
-        });
+        });*/
         this.shadowRoot.querySelector(".chess-board_container").appendChild(box);
-        this.chesslogic.chessboard_pieces[ix][iy].boxComponent = box;
+        this.chessboard[ix][iy].boxComponent = box;
         box.addEventListener("box-created", ()=>{
           this.contLoadedBoxes ++;
           if (this.contLoadedBoxes === 64){
@@ -67,7 +74,7 @@ console.log(x+"   "+y)
   locatePieces() {
     let theme = "negra";
     let direction = -1;
-    this.chesslogic.chessboard_pieces.forEach((x, ix) => {
+    this.chessboard.forEach((x, ix) => {
       x.forEach((y, iy) => {
         if (iy < 2) {
           theme = "blanca";
@@ -99,7 +106,7 @@ console.log(x+"   "+y)
           }
           piece.setAttribute("theme", theme);
           piece.setAttribute("direction", direction);
-          this.chesslogic.chessboard_pieces[ix][iy].boxComponent.shadowRoot.querySelector(".chess-box").appendChild(piece);
+          this.chessboard[ix][iy].boxComponent.shadowRoot.querySelector(".chess-box").appendChild(piece);
         }
       });
     });

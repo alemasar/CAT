@@ -1,6 +1,6 @@
-import Singleton from "./Singleton";
+import SingletonArray from "./SingletonArray";
 
-const instance = new Singleton();
+const instance = new SingletonArray();
 Object.freeze(instance);
 
 export default instance;

@@ -1,6 +1,6 @@
-import Singleton from "CATSRC/classes/Singleton";
+import SingletonObject from "CATSRC/classes/SingletonObject";
 
-const chessboard = new Singleton();
-Object.freeze(chessboard);
+const game = new SingletonObject();
+Object.freeze(game);
 
-export default chessboard;
+export default game;

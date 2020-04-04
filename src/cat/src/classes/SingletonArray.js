@@ -1,4 +1,4 @@
-class Singleton {
+class SingletonArray {
   constructor(){
     this._data = [];
   }
@@ -14,4 +14,4 @@ class Singleton {
   }
 }
 
-export default Singleton;
+export default SingletonArray;

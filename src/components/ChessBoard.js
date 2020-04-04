@@ -36,7 +36,6 @@ class ChessBoard extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.locateBoxes();
   }
-
   attributeChangedCallback(name/*, oldValue, newValue*/) {
     console.log(name)
     if (name === "movement-status") {
@@ -53,24 +52,6 @@ class ChessBoard extends HTMLElement {
       })
     })
   }
-
-  _onClick() {
-    //const boxDiv = this.shadowRoot.querySelector(".chess-box");
-    //console.log("CLICK BOX", this.movementStatus);
-    //this.movementStatus = 1;
-    this.setAttribute("movementStatus", 1);
-    /*this.dispatchEvent(new CustomEvent("box-clicked", {
-      "detail": {"x":this.x,"y":this.y }
-    }));*/
-    // console.log(this.game)
-    /*
-    boxDiv.style.border = "1px solid #ff0000";
-    boxDiv.style.width = boxDiv.offsetWidth - 2 + "px";
-    boxDiv.style.height = boxDiv.offsetHeight - 2 + "px";
-    this.style.left = this.offsetLeft - 1 + "px";
-    this.style.top = this.offsetTop - 1 + "px";*/
-  }
-
   locateBoxes() {
     console.log(this.chessboard)
     this.chessboard.forEach((x, ix) => {
@@ -78,28 +59,8 @@ class ChessBoard extends HTMLElement {
         const box = document.createElement("chess-box");
         box.style.top = y.pieceLogic.top + "px";
         box.style.left = y.pieceLogic.left + "px";
-        box.setAttribute("x", ix);
-        box.setAttribute("y", iy);
-        //box.setAttribute("movementStatus",0);
-        /*        box.addEventListener("box-clicked", (e)=> {
-                  const x = e.detail.x;
-                  const y = e.detail.y;
-                  console.log(x+'   '+y)
-                  if (this.chessboard[x][y].piece !==0){
-                    const piece=this.chessboard[x][y].boxComponent.shadowRoot.querySelector("chess-peo")
-                    const canMove = this.chesslogic.checkMove(x, y, piece.getAttribute("direction"));
-        console.log(x+"   "+y)
-                    if (canMove){
-                      console.log("CASELLA AMB FITXA", parseInt(y) + parseInt(piece.getAttribute("direction")));
-                      this.chesslogic.chessboard_pieces[x][parseInt(y) + parseInt(piece.getAttribute("direction"))].boxComponent.shadowRoot.querySelector(".chess-box").appendChild(piece);
-                      this.chesslogic.chessboard_pieces[x][y].piece=0;
-                      this.chesslogic.chessboard_pieces[x][parseInt(y) + parseInt(piece.getAttribute("direction"))].piece=1;
-                    }
-                  }         
-                });*/
         this.shadowRoot.querySelector(".chess-board_container").appendChild(box);
         this.chessboard[ix][iy].boxComponent = box;
-
         box.addEventListener("box-created", () => {
           this.contLoadedBoxes++;
           if (this.contLoadedBoxes === 64) {

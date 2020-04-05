@@ -137,10 +137,10 @@ class ChessBoard extends HTMLElement {
             case 4:
               piece = document.createElement("chess-alfil");
               break;
-            case 5:
+            case 6:
               piece = document.createElement("chess-reina");
               break;
-            case 6:
+            case 5:
               piece = document.createElement("chess-rei");
               break;
             default:

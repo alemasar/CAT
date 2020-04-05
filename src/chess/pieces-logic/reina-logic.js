@@ -8,7 +8,4 @@ export default class ReinaLogic extends PieceLogic {
       [0, 1], [0, -1], [1, 0], [-1, 0]
     ]
   }
-  checkMove() {
-
-  }
 }

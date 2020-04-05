@@ -4,7 +4,4 @@ export default class VoidPieceLogic extends PieceLogic{
   constructor(x, y, direction){
     super(x, y, direction);
   }
-  checkMove(){
-
-  }
 }

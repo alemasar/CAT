@@ -57,19 +57,13 @@ class ChessBox extends HTMLElement {
     this.style.opacity = "1";
   }
   selectBox(){
-    this.style.border = "1px solid #000";
-    this.style.width = this.offsetWidth - 2 + "px";
-    this.style.height = this.offsetHeight - 2 + "px";
-    this.style.left = this.offsetLeft - 1 + "px";
-    this.style.top = this.offsetTop - 1 + "px";
+    this.style.backgroundColor = "#ffff00";
+    this.style.opacity = ".5";
   }
 
   unselectBox(){
-    this.style.border = "none";
-    this.style.width = this.offsetWidth + 2 + "px";
-    this.style.height = this.offsetHeight + 2 + "px";
-    this.style.left = this.offsetLeft + 1 + "px";
-    this.style.top = this.offsetTop + 1 + "px";
+    this.style.backgroundColor = "transparent";
+    this.style.opacity = "1";
   }
 }
 customElements.define("chess-box", ChessBox);

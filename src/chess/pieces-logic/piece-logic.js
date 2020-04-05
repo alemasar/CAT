@@ -26,7 +26,21 @@ export default class PieceLogic {
     });
     return move;
   }
-  setPosiblesMovements(/*x, y*/) {
+  setPosiblesMovements(x, y) {
     console.log(this.moves);
+    this.moves.forEach(m =>{
+      let xto = parseInt(x) + (m[0] * this.direction);
+      let yto = parseInt(y) + (m[1] * this.direction);
+      while (this.outOfBounds(xto, yto) && this.chessboard[xto][yto].piece === 0){
+        this.posiblesMoves.push([xto, yto]);
+        xto = parseInt(xto) + (m[0] * this.direction);
+        yto = parseInt(yto) + (m[1] * this.direction);
+      }
+      console.log(xto + "  " +yto);
+      if (this.outOfBounds(xto, yto) && this.chessboard[xto][yto].piece !== 0 && this.chessboard[xto][yto].pieceLogic.direction !== this.direction) {
+        this.posiblesMoves.push([xto, yto]);
+      }
+    })
+    console.log(this.posiblesMoves);
   }
 }

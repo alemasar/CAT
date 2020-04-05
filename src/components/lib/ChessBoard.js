@@ -67,13 +67,45 @@ class ChessBoard extends HTMLElement {
           console.log(this.chessboard[this.fix][this.fiy])
           logic.posiblesMoves.forEach(pm => {
             this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
-          })
+          });
           logic.posiblesMoves.splice(0,logic.posiblesMoves.length)
           this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
           this.chessboard[this.inix][this.iniy].pieceLogic = {};
           this.chessboard[this.inix][this.iniy].piece = 0;
           console.log(this.chessboard);
           this.setAttribute("movement-status",0)
+        } else {
+          if (this.chessboard[this.fix][this.fiy].piece !== 0 && this.chessboard[this.fix][this.fiy].pieceLogic.direction === this.chessboard[this.inix][this.iniy].pieceLogic.direction){
+            console.log(this.chessboard);
+            const inilogic=this.chessboard[this.inix][this.iniy].pieceLogic;
+            const filogic=this.chessboard[this.fix][this.fiy].pieceLogic;
+            this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
+            inilogic.posiblesMoves.forEach(pm => {
+              this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
+            });
+            filogic.setPosiblesMovements(this.fix, this.fiy);
+            if (filogic.posiblesMoves.length > 0){
+              this.chessboard[this.fix][this.fiy].boxComponent.selectBox();
+              filogic.posiblesMoves.forEach(pm => {
+                this.chessboard[pm[0]][pm[1]].boxComponent.setPosibleMovementBox();
+              })
+            }else{
+              const inilogic=this.chessboard[this.inix][this.iniy].pieceLogic;
+              this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
+              inilogic.posiblesMoves.forEach(pm => {
+                this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
+              });
+              this.setAttribute("movement-status",0)
+            }
+          } else  {
+            console.log("PASO");
+            const inilogic=this.chessboard[this.inix][this.iniy].pieceLogic;
+            this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
+            inilogic.posiblesMoves.forEach(pm => {
+              this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
+            });
+            this.setAttribute("movement-status",0)
+          }
         }
       }
     }

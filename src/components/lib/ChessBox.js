@@ -22,29 +22,54 @@ class ChessBox extends HTMLElement {
     //this.game = game;
     this.x = 0;
     this.y = 0;
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRoot = this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   connectedCallback() {
-    this.dispatchEvent(new Event('box-created', {bubbles: true, composed: true}));
-    this.addEventListener('click', this._onClick);
+    this.dispatchEvent(new Event("box-created", {bubbles: true, composed: true}));
+    this.addEventListener("click", this._onClick);
   }
 
   disconnectedCallback() {
-    this.removeEventListener('click', this._onClick);
+    this.removeEventListener("click", this._onClick);
   }
 
   _onClick() {
-    this.parent.x = this.x;
-    this.parent.y = this.y;
-    this.parent.setAttribute('movement-status', 1);
+    if (this.parent.getAttribute("movement-status") === "0"){
+      this.parent.inix = this.x;
+      this.parent.iniy = this.y;
+      this.parent.setAttribute("movement-status", 1);
+    } else if (this.parent.getAttribute("movement-status") === "2"){
+      this.parent.fix = this.x;
+      this.parent.fiy = this.y;
+      this.parent.setAttribute("movement-status", 3);
+    }
+  }
+
+  setPosibleMovementBox(){
+    this.style.backgroundColor = "#ff0000";
+    this.style.opacity = ".5";
+  }
+  unsetPosibleMovementBox(){
+    this.style.backgroundColor = "transparent";
+    this.style.opacity = "1";
+  }
+  selectBox(){
     this.style.border = "1px solid #000";
     this.style.width = this.offsetWidth - 2 + "px";
     this.style.height = this.offsetHeight - 2 + "px";
     this.style.left = this.offsetLeft - 1 + "px";
     this.style.top = this.offsetTop - 1 + "px";
   }
+
+  unselectBox(){
+    this.style.border = "none";
+    this.style.width = this.offsetWidth + 2 + "px";
+    this.style.height = this.offsetHeight + 2 + "px";
+    this.style.left = this.offsetLeft + 1 + "px";
+    this.style.top = this.offsetTop + 1 + "px";
+  }
 }
-customElements.define('chess-box', ChessBox);
+customElements.define("chess-box", ChessBox);
 

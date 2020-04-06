@@ -35,29 +35,8 @@ export default class GameLogic {
     });
 //    game.movementStatus = 0;
     game.set("movementStatus", 0);
-    game.set("movementPlayer", 0);
+    game.set("player", 1);
     //game.add("movementStatus", 0);  
-  }
-
-  checkFrontOfPiece(x, y, desx, desy) {
-    let checkBox = false;
-
-    if (this.chessboard_pieces[parseInt(x) + parseInt(desx)][parseInt(y) + parseInt(desy)].piece !== 0) {
-      checkBox = true;
-    }
-    return checkBox;
-  }
-
-  checkMove(/*x, y, direction*/) {
-    //const piece = this.chessboard_pieces[x][y].piece;
-    let canMove = false;
-    /*switch (piece) {
-      default:
-        if (!this.checkFrontOfPiece(x, y, 0, 1 * direction, this.chessboard_pieces[parseInt(x) + parseInt(desx)][parseInt(y) + parseInt(desy)].piece)) {
-          canMove = true;
-        }
-    }*/
-    return canMove;
   }
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};

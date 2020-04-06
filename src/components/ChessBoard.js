@@ -1,6 +1,6 @@
 /* eslint-disable */
 import chessboard from "CHESSLOGIC/chessboard-instance";
-//import game from "CHESSLOGIC/game-instance";
+import game from "CHESSLOGIC/game-instance";
 import ChessLogic from "CHESSLOGIC/game-logic";
 
 <style>
@@ -32,6 +32,7 @@ class ChessBoard extends HTMLElement {
     this.iniy = 0;
     this.fix = 0;
     this.fiy = 0;
+    this.player = game.get("player");
     this.chessboard = chessboard.getAll();
     this.contLoadedBoxes = 0;
     this.attachShadow({ mode: 'open' });
@@ -44,7 +45,13 @@ class ChessBoard extends HTMLElement {
       //this.setAttribute(name, newValue)
       console.log(this.chessboard[this.inix][this.iniy]);
       if (this.chessboard[this.inix][this.iniy].piece !== 0 && newValue === "1"){
-        this.setAttribute("movement-status",2)
+        if (this.chessboard[this.inix][this.iniy].pieceLogic.direction === this.player){
+          console.log("MISMO JUGADOR")
+          this.setAttribute("movement-status",2)
+        } else{
+          console.log("DIFERENTE JUGADOR")
+          this.setAttribute("movement-status",0)
+        }
       } else if(newValue === "2"){
         const logic=this.chessboard[this.inix][this.iniy].pieceLogic;
         console.log(this.inix+"  "+this.iniy);
@@ -63,6 +70,10 @@ class ChessBoard extends HTMLElement {
           const piece = this.chessboard[this.inix][this.iniy].boxComponent.shadowRoot.querySelector(".chess-box *");
           const logic=this.chessboard[this.inix][this.iniy].pieceLogic;
           console.log(piece)
+          if (this.chessboard[this.fix][this.fiy].piece !== 0){
+            const killpiece = this.chessboard[this.fix][this.fiy].boxComponent.shadowRoot.querySelector(".chess-box *");
+            killpiece.parentNode.removeChild(killpiece);
+          }
           this.chessboard[this.fix][this.fiy].boxComponent.shadowRoot.querySelector(".chess-box").appendChild(piece);
           this.chessboard[this.fix][this.fiy].pieceLogic = this.chessboard[this.inix][this.iniy].pieceLogic;
           this.chessboard[this.fix][this.fiy].piece = this.chessboard[this.inix][this.iniy].piece;
@@ -75,7 +86,9 @@ class ChessBoard extends HTMLElement {
           this.chessboard[this.inix][this.iniy].pieceLogic = {};
           this.chessboard[this.inix][this.iniy].piece = 0;
           console.log(this.chessboard);
-          this.setAttribute("movement-status",0)
+          this.setAttribute("movement-status",0);
+          this.player = this.player * -1;
+          game.set("player", this.player);
         } else {
           if (this.chessboard[this.fix][this.fiy].piece !== 0 && this.chessboard[this.fix][this.fiy].pieceLogic.direction === this.chessboard[this.inix][this.iniy].pieceLogic.direction){
             console.log(this.chessboard);
@@ -100,7 +113,6 @@ class ChessBoard extends HTMLElement {
               this.setAttribute("movement-status",0)
             }
           } else  {
-            console.log("PASO");
             const inilogic=this.chessboard[this.inix][this.iniy].pieceLogic;
             this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
             inilogic.posiblesMoves.forEach(pm => {

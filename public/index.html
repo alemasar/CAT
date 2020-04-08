@@ -1,10 +1,56 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8"/>
-    <title>TITLE</title>
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <title>TITLE</title>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-analytics.js"></script>
+
+</head>
+
+<body>
+  <div id="app"></div>
+
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyA5DKtWhAz56x022merfaje4gZbGLW6lYM",
+      authDomain: "cat-chess.firebaseapp.com",
+      databaseURL: "https://cat-chess.firebaseio.com",
+      projectId: "cat-chess",
+      storageBucket: "cat-chess.appspot.com",
+      messagingSenderId: "613697459991",
+      appId: "1:613697459991:web:00af338c54c2a457e1c952",
+      measurementId: "G-Y2VY4BNFPG"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    //firebase.analytics();
+    const dbRef = firebase.firestore();
+    console.log(dbRef)
+    //const usersRef = dbRef.child('cat-chess');
+    //const docRef = dbRef.collection("game").doc("d9JQqx7jx8m6zTys2VjP");
+
+    // Valid options for source are 'server', 'cache', or
+    // 'default'. See https://firebase.google.com/docs/reference/js/firebase.firestore.GetOptions
+    // for more information.
+    const getOptions = {};
+
+    // Get a document, forcing the SDK to fetch from the offline cache.
+    dbRef.collection("game").get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+      });
+    });
+  </script>
+</body>
+
 </html>

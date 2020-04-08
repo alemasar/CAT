@@ -19,6 +19,8 @@ import ReinaLogic from "./pieces-logic/reina-logic";
 */
 export default class GameLogic {
   constructor() {
+    this.dbRef = firebase.firestore();
+    this.idGame = 0;
     this.chessboard_pieces = [
       [{ piece: 2 }, { piece: 1 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 1 }, { piece: 2 }],
       [{ piece: 3 }, { piece: 1 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 1 }, { piece: 3 }],
@@ -30,14 +32,70 @@ export default class GameLogic {
       [{ piece: 2 }, { piece: 1 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 1 }, { piece: 2 }]
     ];
     this.setPositions();
-    this.chessboard_pieces.forEach((y)=>{
+    this.chessboard_pieces.forEach((y) => {
       chessboard.add(y);
     });
-//    game.movementStatus = 0;
+    //    game.movementStatus = 0;
     game.set("movementStatus", 0);
     game.set("player", 1);
     //game.add("movementStatus", 0);  
   }
+  setMovement(player, x, y, callback, idGame) {
+
+    /*global firebase:true*/
+    /*eslint no-undef: "error"*/
+    if (this.idGame === 0 && idGame === 0) {
+      this.dbRef.collection("game").add({
+        player: player,
+        x: x,
+        y: y
+      })
+        .then((docRef) => {
+          callback();
+          this.idGame = docRef.id;
+          console.log("Document written with ID: ", docRef.id);
+          this.dbRef.collection("game").doc(docRef.id).onSnapshot((snapshot)=>{
+            console.log(snapshot.data());
+            /*snapshot.docChanges().forEach(function(change) {
+              if (change.type === "added") {
+                  console.log("New movement: ", change.doc.data());
+                  console.log("New movement: ", change.doc.id);
+              }
+            })*/
+          })
+        })
+        .catch(function (error) {
+          console.error("Error adding document: ", error);
+        });
+    } else {
+      console.log(idGame)
+      if (idGame === 0){
+        this.dbRef.collection("game").doc(this.idGame).set({
+          player: player,
+          x: x,
+          y: y
+        })
+          .then(() => {
+            callback();
+            console.log("Movement executed");
+          })
+          .catch(function (error) {
+            console.error("Error adding document: ", error);
+          });
+      } else {
+        this.dbRef.collection("game").doc(idGame).onSnapshot((snapshot)=>{
+          console.log(snapshot.data());
+          /*snapshot.docChanges().forEach(function(change) {
+            if (change.type === "added") {
+                console.log("New movement: ", change.doc.data());
+                console.log("New movement: ", change.doc.id);
+            }
+          })*/
+        })
+      }
+    }
+  }
+
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};
     switch (piece) {

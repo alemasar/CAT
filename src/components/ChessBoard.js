@@ -8,6 +8,11 @@ import ChessLogic from "CHESSLOGIC/game-logic";
     display:flex;
     justify-content:center;
   }
+  .list-of-games{
+    width:200px;
+    display:flex;
+    flex-direction:column;
+  }
   .chess-board_container{
     background-image: image-url("chess-board.svg");
     background-size:600px 600px;
@@ -17,6 +22,7 @@ import ChessLogic from "CHESSLOGIC/game-logic";
   }
 </style>
   <template>
+    <div class="list-of-games"></div>
     <div class="chess-board_container">
     </div>
   </template>
@@ -28,6 +34,7 @@ class ChessBoard extends HTMLElement {
   constructor() {
     super();
     this.chessLogic = new ChessLogic();
+    this.createSubcribe = {};
     this.idGame = 0;
     this.inix = 0;
     this.iniy = 0;
@@ -39,10 +46,58 @@ class ChessBoard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.locateBoxes();
+    this.initGame();
+    this.listAllGames();
+  }
+  initGame(){
     document.getElementById("initPartida").addEventListener("click", ()=>{
-      console.log(document.getElementById("idPartida").value);
-      this.idGame = document.getElementById("idPartida").value;
+      /*console.log(document.getElementById("idPartida").value);
+      this.idGame = document.getElementById("idPartida").value;*/
+      const val = document.getElementById("idPartida").value;
+      if (val === ""){
+        this.shadowRoot.querySelector(".list-of-games").style.display="flex";
+        this.chessLogic.initGame();
+        this.listAllGames();
+      }else{
+        this.chessLogic.idGame = val;
+        this.createSubcribe();
+        this.shadowRoot.querySelector(".list-of-games").style.display="none";
+      }
     });
+  }
+  listAllGames(){
+    const ref = this.chessLogic.listAllGames();
+    this.createSubcribe = ref.onSnapshot(async ()=>{
+      const data = await ref.get();
+      this.shadowRoot.querySelector(".list-of-games").innerHTML = "";
+      data.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+        const link = document.createElement("A");
+        link.setAttribute("href","#");
+        link.innerHTML=doc.id;
+        this.shadowRoot.querySelector(".list-of-games").appendChild(link);
+        link.addEventListener("click", (e) =>{
+          e.preventDefault();
+          document.getElementById("idPartida").value = doc.id;
+        })
+      });
+    })
+    /*const data = await this.chessLogic.listAllGames();
+    console.log(data);
+    data.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      const link = document.createElement("A");
+      link.setAttribute("href","#");
+      link.innerHTML=doc.id;
+      this.shadowRoot.querySelector(".list-of-games").appendChild(link);
+      link.addEventListener("click", (e) =>{
+        e.preventDefault();
+        document.getElementById("idPartida").value = doc.id;
+      })
+    });*/
+
   }
   attributeChangedCallback(name, oldValue, newValue) {
     console.log(newValue)
@@ -91,12 +146,12 @@ class ChessBoard extends HTMLElement {
           this.chessboard[this.inix][this.iniy].pieceLogic = {};
           this.chessboard[this.inix][this.iniy].piece = 0;
           console.log(this.chessboard);
-          const movement = () => {
+          /*const movement = () => {
             this.setAttribute("movement-status", 0);
             this.player = this.player * -1;
             game.set("player", this.player);
-          }
-          this.chessLogic.setMovement(this.player, this.fix, this.fiy, movement, this.idGame);
+          }*/
+          //this.chessLogic.setMovement(this.player, this.fix, this.fiy, movement, this.idGame);
         } else {
           if (this.chessboard[this.fix][this.fiy].piece !== 0 && this.chessboard[this.fix][this.fiy].pieceLogic.direction === this.chessboard[this.inix][this.iniy].pieceLogic.direction) {
             console.log(this.chessboard);

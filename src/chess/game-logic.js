@@ -19,6 +19,8 @@ import ReinaLogic from "./pieces-logic/reina-logic";
 */
 export default class GameLogic {
   constructor() {
+    /*global firebase:true*/
+    /*eslint no-undef: "error"*/
     this.dbRef = firebase.firestore();
     this.idGame = 0;
     this.chessboard_pieces = [
@@ -40,10 +42,27 @@ export default class GameLogic {
     game.set("player", 1);
     //game.add("movementStatus", 0);  
   }
-  setMovement(player, x, y, callback, idGame) {
-
-    /*global firebase:true*/
-    /*eslint no-undef: "error"*/
+  async initGame(){
+    const docRef = await this.dbRef.collection("game").add({
+      player: 1,
+      x: 0,
+      y: 0
+    });
+    console.log(docRef);
+    this.idGame = docRef.id;
+  }
+  connectGame(){
+    this.dbRef.collection("game").doc(this.idGame).onSnapshot((snapshot)=>{
+      console.log(snapshot.data());
+    })
+  }
+  listAllGames(){
+  /*  const allGames = await this.dbRef.collection("game").get();
+    console.log(allGames);*/
+    return this.dbRef.collection("game");
+    //return this.dbRef.collection("game").get();
+  }
+/*  setMovement(player, x, y, callback, idGame) {
     if (this.idGame === 0 && idGame === 0) {
       this.dbRef.collection("game").add({
         player: player,
@@ -56,12 +75,6 @@ export default class GameLogic {
           console.log("Document written with ID: ", docRef.id);
           this.dbRef.collection("game").doc(docRef.id).onSnapshot((snapshot)=>{
             console.log(snapshot.data());
-            /*snapshot.docChanges().forEach(function(change) {
-              if (change.type === "added") {
-                  console.log("New movement: ", change.doc.data());
-                  console.log("New movement: ", change.doc.id);
-              }
-            })*/
           })
         })
         .catch(function (error) {
@@ -85,16 +98,10 @@ export default class GameLogic {
       } else {
         this.dbRef.collection("game").doc(idGame).onSnapshot((snapshot)=>{
           console.log(snapshot.data());
-          /*snapshot.docChanges().forEach(function(change) {
-            if (change.type === "added") {
-                console.log("New movement: ", change.doc.data());
-                console.log("New movement: ", change.doc.id);
-            }
-          })*/
         })
       }
     }
-  }
+  }*/
 
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};

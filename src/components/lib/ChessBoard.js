@@ -8,11 +8,6 @@ const template = document.createElement("template");
   display: flex;
   justify-content: center; }
 
-.list-of-games {
-  width: 200px;
-  display: flex;
-  flex-direction: column; }
-
 .chess-board_container {
   background-image: url('src/img/chess-board.svg');
   background-size: 600px 600px;
@@ -22,7 +17,7 @@ const template = document.createElement("template");
 
       </style>
       
-    <div class="list-of-games"></div>
+    <game-list></game-list>
     <div class="chess-board_container">
     </div>
   `;
@@ -45,63 +40,15 @@ class ChessBoard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.locateBoxes();
-    this.initGame();
-    this.listAllGames();
-  }
-  initGame(){
-    document.getElementById("initPartida").addEventListener("click", ()=>{
-      /*console.log(document.getElementById("idPartida").value);
-      this.idGame = document.getElementById("idPartida").value;*/
-      const val = document.getElementById("idPartida").value;
-      if (val === ""){
-        this.shadowRoot.querySelector(".list-of-games").style.display="flex";
-        this.chessLogic.initGame();
-        this.listAllGames();
-      }else{
-        this.chessLogic.idGame = val;
-        this.createSubcribe();
-        this.shadowRoot.querySelector(".list-of-games").style.display="none";
-      }
+    document.addEventListener("movement-status-changed", (e) => {
+      console.log(e.detail);
+      this.setAttribute("movement-status", e.detail["movement-status"])
     });
-  }
-  listAllGames(){
-    const ref = this.chessLogic.listAllGames();
-    this.createSubcribe = ref.onSnapshot(async ()=>{
-      const data = await ref.get();
-      this.shadowRoot.querySelector(".list-of-games").innerHTML = "";
-      data.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
-        const link = document.createElement("A");
-        link.setAttribute("href","#");
-        link.innerHTML=doc.id;
-        this.shadowRoot.querySelector(".list-of-games").appendChild(link);
-        link.addEventListener("click", (e) =>{
-          e.preventDefault();
-          document.getElementById("idPartida").value = doc.id;
-        })
-      });
-    })
-    /*const data = await this.chessLogic.listAllGames();
-    console.log(data);
-    data.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-      const link = document.createElement("A");
-      link.setAttribute("href","#");
-      link.innerHTML=doc.id;
-      this.shadowRoot.querySelector(".list-of-games").appendChild(link);
-      link.addEventListener("click", (e) =>{
-        e.preventDefault();
-        document.getElementById("idPartida").value = doc.id;
-      })
-    });*/
-
+/*    this.initGame();
+    this.listAllGames();*/
   }
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log(newValue)
-    if (name === "movement-status" && newValue !== 0) {
-      //this.setAttribute(name, newValue)
+    if (name === "movement-status" && newValue !== -1) {
       console.log(this.chessboard[this.inix][this.iniy]);
       if (this.chessboard[this.inix][this.iniy].piece !== 0 && newValue === "1") {
         if (this.chessboard[this.inix][this.iniy].pieceLogic.direction === this.player) {
@@ -172,7 +119,7 @@ class ChessBoard extends HTMLElement {
               inilogic.posiblesMoves.forEach(pm => {
                 this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
               });
-              this.setAttribute("movement-status", 0)
+              this.setAttribute("movement-status", 0);
             }
           } else {
             const inilogic = this.chessboard[this.inix][this.iniy].pieceLogic;
@@ -180,15 +127,16 @@ class ChessBoard extends HTMLElement {
             inilogic.posiblesMoves.forEach(pm => {
               this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
             });
-            this.setAttribute("movement-status", 0)
+            this.setAttribute("movement-status", 0);
           }
         }
       }
     }
+
   }
   connectedCallback() {
     // this.addEventListener('click', this._onClick);
-    this.setAttribute("movement-status", 0);
+    this.setAttribute("movement-status", -1);
     this.chessboard.forEach((x, ix) => {
       x.forEach((y, iy) => {
         this.chessboard[ix][iy].boxComponent.parent = this;

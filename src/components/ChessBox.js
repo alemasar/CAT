@@ -38,6 +38,7 @@ class ChessBox extends HTMLElement {
 
   _onClick() {
     if (this.parent.getAttribute("movement-status") === "0"){
+      console.log("PASOOO")
       this.parent.inix = this.x;
       this.parent.iniy = this.y;
       this.parent.setAttribute("movement-status", 1);

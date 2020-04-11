@@ -33,23 +33,6 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     //firebase.analytics();
-    const dbRef = firebase.firestore();
-    console.log(dbRef)
-    //const usersRef = dbRef.child('cat-chess');
-    //const docRef = dbRef.collection("game").doc("d9JQqx7jx8m6zTys2VjP");
-
-    // Valid options for source are 'server', 'cache', or
-    // 'default'. See https://firebase.google.com/docs/reference/js/firebase.firestore.GetOptions
-    // for more information.
-    const getOptions = {};
-
-    // Get a document, forcing the SDK to fetch from the offline cache.
-    dbRef.collection("game").get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
-      });
-    });
   </script>
 </body>
 

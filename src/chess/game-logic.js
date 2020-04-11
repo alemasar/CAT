@@ -38,70 +38,85 @@ export default class GameLogic {
       chessboard.add(y);
     });
     //    game.movementStatus = 0;
-    game.set("movementStatus", 0);
+    game.set("movement-status", -1);
     game.set("player", 1);
     //game.add("movementStatus", 0);  
   }
-  async initGame(){
-    const docRef = await this.dbRef.collection("game").add({
-      player: 1,
-      x: 0,
-      y: 0
-    });
-    console.log(docRef);
-    this.idGame = docRef.id;
+  createGame(gameData) {
+    gameData.moves = [];
+    console.log(gameData);
+    const docRef = this.dbRef.collection("game").add(gameData);
+    //this.idGame = docRef.id;
+    console.log(this.idGame);
+    return docRef;
   }
-  connectGame(){
-    this.dbRef.collection("game").doc(this.idGame).onSnapshot((snapshot)=>{
+  updateGame(idGame, gameData){
+    /*const doc = await this.dbRef.collection("game").doc(idGame).get();
+    const data = doc.data();
+    data.user.push(gameData);*/
+    return this.updateGameData(idGame, gameData);
+  }
+  connectGame() {
+    this.dbRef.collection("game").doc(this.idGame).onSnapshot((snapshot) => {
       console.log(snapshot.data());
     })
   }
-  listAllGames(){
-  /*  const allGames = await this.dbRef.collection("game").get();
-    console.log(allGames);*/
+  getMovementStatus(){
+    const docRef = this.dbRef.collection("game").doc(this.idGame).get();
+    return docRef;
+  }
+  updateGameData(idGame, gameData){
+    const docRef = this.dbRef.collection("game").doc(idGame).update({
+      user: firebase.firestore.FieldValue.arrayUnion(gameData)
+    });
+    return docRef;
+  }
+  listAllGames() {
+    /*  const allGames = await this.dbRef.collection("game").get();
+      console.log(allGames);*/
     return this.dbRef.collection("game");
     //return this.dbRef.collection("game").get();
   }
-/*  setMovement(player, x, y, callback, idGame) {
-    if (this.idGame === 0 && idGame === 0) {
-      this.dbRef.collection("game").add({
-        player: player,
-        x: x,
-        y: y
-      })
-        .then((docRef) => {
-          callback();
-          this.idGame = docRef.id;
-          console.log("Document written with ID: ", docRef.id);
-          this.dbRef.collection("game").doc(docRef.id).onSnapshot((snapshot)=>{
-            console.log(snapshot.data());
-          })
-        })
-        .catch(function (error) {
-          console.error("Error adding document: ", error);
-        });
-    } else {
-      console.log(idGame)
-      if (idGame === 0){
-        this.dbRef.collection("game").doc(this.idGame).set({
+  /*  setMovement(player, x, y, callback, idGame) {
+      if (this.idGame === 0 && idGame === 0) {
+        this.dbRef.collection("game").add({
           player: player,
           x: x,
           y: y
         })
-          .then(() => {
+          .then((docRef) => {
             callback();
-            console.log("Movement executed");
+            this.idGame = docRef.id;
+            console.log("Document written with ID: ", docRef.id);
+            this.dbRef.collection("game").doc(docRef.id).onSnapshot((snapshot)=>{
+              console.log(snapshot.data());
+            })
           })
           .catch(function (error) {
             console.error("Error adding document: ", error);
           });
       } else {
-        this.dbRef.collection("game").doc(idGame).onSnapshot((snapshot)=>{
-          console.log(snapshot.data());
-        })
+        console.log(idGame)
+        if (idGame === 0){
+          this.dbRef.collection("game").doc(this.idGame).set({
+            player: player,
+            x: x,
+            y: y
+          })
+            .then(() => {
+              callback();
+              console.log("Movement executed");
+            })
+            .catch(function (error) {
+              console.error("Error adding document: ", error);
+            });
+        } else {
+          this.dbRef.collection("game").doc(idGame).onSnapshot((snapshot)=>{
+            console.log(snapshot.data());
+          })
+        }
       }
-    }
-  }*/
+    }*/
 
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};

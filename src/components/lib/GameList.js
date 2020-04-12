@@ -96,7 +96,7 @@ class GameList extends HTMLElement {
   constructor() {
     super();
     this.chessLogic = new ChessLogic();
-    this.createSubscribe = {};
+    this.connectSubscribe = {};
     this.joinSubscribe = {};
     this.createGameConfig = {};
     this.joinGameConfig = {};
@@ -147,6 +147,7 @@ class GameList extends HTMLElement {
       this.tabLinksRemoveEvents();
       this.shadowRoot.querySelector("#createIdPartida").value = this.chessLogic.idGame;
       game.set("idGame", this.chessLogic.idGame);
+      game.set("player", this.createGameConfig.usercolor);
       this.connectGame();
     }/* else {
       this.chessLogic.idGame = val;
@@ -188,7 +189,10 @@ class GameList extends HTMLElement {
   async joinSetUsernameEvent(){
     this.joinGameConfig.username = this.shadowRoot.querySelector("#joinUsername").value;
     this.shadowRoot.querySelector("#joinUsername").disabled = true;
-    await this.chessLogic.updateGame(this.chessLogic.idGame, this.joinGameConfig);
+    this.shadowRoot.querySelector("#joinSetUsername").disabled = true;
+    console.log(this.joinGameConfig.usercolor)
+    game.set("player", this.joinGameConfig.usercolor);
+    await this.chessLogic.updateConfigGameData(this.joinGameConfig);
   }
   removeListGamesEvent(){
     this.shadowRoot.querySelectorAll(".list-of-games a").forEach((listLink, i) => {
@@ -212,12 +216,12 @@ class GameList extends HTMLElement {
           e.preventDefault();
           this.shadowRoot.querySelector("#joinIdPartida").value = doc.id;
           this.chessLogic.idGame = doc.id;
-          if (gameData.user[0].usercolor === 1){
+          if (gameData.user[0].usercolor === "1"){
             this.shadowRoot.querySelector("#joinColor").value = "Negres";
-            this.joinGameConfig.usercolor = -1;
+            this.joinGameConfig.usercolor = "-1";
           } else {
             this.shadowRoot.querySelector("#joinColor").value = "Blanques";
-            this.joinGameConfig.usercolor = 1;
+            this.joinGameConfig.usercolor = "1";
           }
           this.shadowRoot.querySelector(".list-of-games").style.display = "none";
           this.removeListGamesEvent();
@@ -289,7 +293,7 @@ class GameList extends HTMLElement {
   async connectGame() {
     const ref = this.chessLogic.listAllGames();
     const refDoc = ref.doc(this.chessLogic.idGame);
-    this.createSubscribe = refDoc.onSnapshot((doc) => {
+    this.connectSubscribe = refDoc.onSnapshot((doc) => {
       const data = doc.data();
       this.shadowRoot.querySelectorAll("h3 .user").forEach((u,i)=>{
         let color = "Blanques - ";
@@ -300,6 +304,12 @@ class GameList extends HTMLElement {
           u.innerHTML = color + data.user[i].username;
         }
       });
+      if (data.user.length === 2){
+        this.connectSubscribe();
+        game.set("idGame", this.chessLogic.idGame);
+        const event = new CustomEvent("start-playing", {});
+        document.dispatchEvent(event);
+      }
       this.shadowRoot.querySelector("h3 .versus-label").style.display = "inline";
     });
   }

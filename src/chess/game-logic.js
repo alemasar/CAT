@@ -23,6 +23,7 @@ export default class GameLogic {
     /*eslint no-undef: "error"*/
     this.dbRef = firebase.firestore();
     this.idGame = 0;
+    this.startPlayingConnection = {};
     this.chessboard_pieces = [
       [{ piece: 2 }, { piece: 1 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 1 }, { piece: 2 }],
       [{ piece: 3 }, { piece: 1 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 0 }, { piece: 1 }, { piece: 3 }],
@@ -42,44 +43,53 @@ export default class GameLogic {
     game.set("player", 1);
     //game.add("movementStatus", 0);  
   }
+  
+  listAllGames() {
+    return this.dbRef.collection("game");
+  }
+
   createGame(gameData) {
     gameData.moves = [];
     console.log(gameData);
-    const docRef = this.dbRef.collection("game").add(gameData);
+    const docRef = this.listAllGames().add(gameData);
     //this.idGame = docRef.id;
     console.log(this.idGame);
     return docRef;
   }
-  updateGame(idGame, gameData){
-    /*const doc = await this.dbRef.collection("game").doc(idGame).get();
-    const data = doc.data();
-    data.user.push(gameData);*/
-    return this.updateGameData(idGame, gameData);
-  }
-  connectGame() {
-    this.dbRef.collection("game").doc(this.idGame).onSnapshot((snapshot) => {
-      console.log(snapshot.data());
-    })
-  }
+
   getMovementStatus(){
-    const docRef = this.dbRef.collection("game").doc(this.idGame).get();
+    const docRef = this.listAllGames().doc(this.idGame).get();
     return docRef;
   }
-  updateGameData(idGame, gameData){
-    const docRef = this.dbRef.collection("game").doc(idGame).update({
+  updateConfigGameData(gameData){
+    const docRef = this.listAllGames().doc(this.idGame).update({
       user: firebase.firestore.FieldValue.arrayUnion(gameData)
     });
     return docRef;
   }
-  listAllGames() {
-    /*  const allGames = await this.dbRef.collection("game").get();
-      console.log(allGames);*/
-    return this.dbRef.collection("game");
-    //return this.dbRef.collection("game").get();
+  startPlaying(){
+    console.log(this.idGame);
+    this.startPlayingConnection = this.listAllGames().doc(this.idGame).onSnapshot((doc)=>{
+      console.log(doc.data());
+
+    });
+  }
+  setMovement(player, inix, iniy, fix, fiy){
+    const move = {
+      player,
+      inix,
+      iniy,
+      fix,
+      fiy
+    }
+    const docRef = this.listAllGames().doc(this.idGame).update({
+      moves: firebase.firestore.FieldValue.arrayUnion(move)
+    });
+    return docRef;
   }
   /*  setMovement(player, x, y, callback, idGame) {
       if (this.idGame === 0 && idGame === 0) {
-        this.dbRef.collection("game").add({
+        this.listAllGames().add({
           player: player,
           x: x,
           y: y
@@ -88,7 +98,7 @@ export default class GameLogic {
             callback();
             this.idGame = docRef.id;
             console.log("Document written with ID: ", docRef.id);
-            this.dbRef.collection("game").doc(docRef.id).onSnapshot((snapshot)=>{
+            this.listAllGames().doc(docRef.id).onSnapshot((snapshot)=>{
               console.log(snapshot.data());
             })
           })
@@ -98,7 +108,7 @@ export default class GameLogic {
       } else {
         console.log(idGame)
         if (idGame === 0){
-          this.dbRef.collection("game").doc(this.idGame).set({
+          this.listAllGames().doc(this.idGame).set({
             player: player,
             x: x,
             y: y
@@ -111,7 +121,7 @@ export default class GameLogic {
               console.error("Error adding document: ", error);
             });
         } else {
-          this.dbRef.collection("game").doc(idGame).onSnapshot((snapshot)=>{
+          this.listAllGames().doc(idGame).onSnapshot((snapshot)=>{
             console.log(snapshot.data());
           })
         }
@@ -153,8 +163,6 @@ export default class GameLogic {
         }
         const piece = this.getPieceLogic(y.piece, ix, iy, direction);
         this.chessboard_pieces[ix][iy].pieceLogic = piece;
-        /*        this.chessboard_pieces[ix][iy].top = top;
-                this.chessboard_pieces[ix][iy].left = left;*/
       })
     })
   }

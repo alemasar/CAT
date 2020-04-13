@@ -104,10 +104,10 @@ class ChessBoard extends HTMLElement {
   }
 
   async attributeChangedCallback(name, oldValue, newValue) {
-    console.log("MISMO JUGADOR: "+typeof this.player+", "+typeof this.turn);
+    console.log("MISMO JUGADOR: "+this.chessboard[this.inix][this.iniy].piece+"  "+this.inix);
     if (name === "movement-status" && newValue !== -1 && this.player === this.turn) {
-      if (this.chessboard[this.inix][this.iniy].piece !== 0 && newValue === "1") {
-        if (this.chessboard[this.inix][this.iniy].pieceLogic.direction === parseInt(this.turn)) {
+      if (newValue === "1") {
+        if (this.chessboard[this.inix][this.iniy].pieceLogic.direction === parseInt(this.turn) && this.chessboard[this.inix][this.iniy].piece !== 0) {
           console.log("MISMO JUGADOR: "+this.chessboard[this.inix][this.iniy].pieceLogic.direction+", "+ parseInt(this.turn));
           this.setAttribute("movement-status", 2)
         } else {
@@ -165,7 +165,6 @@ class ChessBoard extends HTMLElement {
         }
       }
     }
-
   }
   connectedCallback() {
     // this.addEventListener('click', this._onClick);
@@ -208,6 +207,7 @@ class ChessBoard extends HTMLElement {
   locatePieces() {
     let theme = "negra";
     let direction = -1;
+    this.chessboard.kingPosition = [];
     this.chessboard.forEach((x, ix) => {
       x.forEach((y, iy) => {
         if (iy < 2) {
@@ -233,6 +233,7 @@ class ChessBoard extends HTMLElement {
               piece = document.createElement("chess-reina");
               break;
             case 5:
+              this.chessboard.kingPosition.push({ direction, x, y })
               piece = document.createElement("chess-rei");
               break;
             default:

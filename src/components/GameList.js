@@ -193,12 +193,15 @@ class GameList extends HTMLElement {
     //this.createSubscribe();
   }
   async joinSetUsernameEvent(){
-    this.joinGameConfig.username = this.shadowRoot.querySelector("#joinUsername").value;
-    this.shadowRoot.querySelector("#joinUsername").disabled = true;
-    this.shadowRoot.querySelector("#joinSetUsername").disabled = true;
-    console.log(this.joinGameConfig.usercolor)
-    game.set("player", this.joinGameConfig.usercolor);
-    await this.chessLogic.updateConfigGameData(this.joinGameConfig);
+    const val = this.shadowRoot.querySelector("#joinUsername").value;
+    if (val !== ""){
+      this.joinGameConfig.username = val;
+      this.shadowRoot.querySelector("#joinUsername").disabled = true;
+      this.shadowRoot.querySelector("#joinSetUsername").disabled = true;
+      console.log(this.joinGameConfig.usercolor)
+      game.set("player", this.joinGameConfig.usercolor);
+      await this.chessLogic.updateConfigGameData(this.joinGameConfig);
+    }
   }
   removeListGamesEvent(){
     this.shadowRoot.querySelectorAll(".list-of-games a").forEach((listLink, i) => {

@@ -43,7 +43,7 @@ export default class GameLogic {
     game.set("player", 1);
     //game.add("movementStatus", 0);  
   }
-  
+
   listAllGames() {
     return this.dbRef.collection("game");
   }
@@ -57,24 +57,18 @@ export default class GameLogic {
     return docRef;
   }
 
-  getMovementStatus(){
+  getMovementStatus() {
     const docRef = this.listAllGames().doc(this.idGame).get();
     return docRef;
   }
-  updateConfigGameData(gameData){
+  updateConfigGameData(gameData) {
     const docRef = this.listAllGames().doc(this.idGame).update({
       user: firebase.firestore.FieldValue.arrayUnion(gameData)
     });
     return docRef;
   }
-  startPlaying(){
-    console.log(this.idGame);
-    this.startPlayingConnection = this.listAllGames().doc(this.idGame).onSnapshot((doc)=>{
-      console.log(doc.data());
 
-    });
-  }
-  setMovement(player, inix, iniy, fix, fiy){
+  setMovement(player, inix, iniy, fix, fiy) {
     const move = {
       player,
       inix,
@@ -87,47 +81,70 @@ export default class GameLogic {
     });
     return docRef;
   }
-  /*  setMovement(player, x, y, callback, idGame) {
-      if (this.idGame === 0 && idGame === 0) {
-        this.listAllGames().add({
-          player: player,
-          x: x,
-          y: y
-        })
-          .then((docRef) => {
-            callback();
-            this.idGame = docRef.id;
-            console.log("Document written with ID: ", docRef.id);
-            this.listAllGames().doc(docRef.id).onSnapshot((snapshot)=>{
-              console.log(snapshot.data());
-            })
-          })
-          .catch(function (error) {
-            console.error("Error adding document: ", error);
-          });
-      } else {
-        console.log(idGame)
-        if (idGame === 0){
-          this.listAllGames().doc(this.idGame).set({
-            player: player,
-            x: x,
-            y: y
-          })
-            .then(() => {
-              callback();
-              console.log("Movement executed");
-            })
-            .catch(function (error) {
-              console.error("Error adding document: ", error);
-            });
-        } else {
-          this.listAllGames().doc(idGame).onSnapshot((snapshot)=>{
-            console.log(snapshot.data());
-          })
-        }
-      }
-    }*/
+  checkAllMoves(inix, iniy, fix, fiy, turn) {
+    let initPiece = {};
+    let fiPiece = {};
+    let posiblesMoves = [];
+    let virtualChessboard = [];
+    let x = 0;
+    let y = 0;
+    let kingX = 0;
+    let kingY = 0;
+    let kingFound = false;
+    let posibleKingDeath = false;
+    this.chessboard_pieces.forEach((fila) => {
+      virtualChessboard.push([...fila])
+    });
+    //console.log(virtualChessboard);
 
+    while (!kingFound && x < virtualChessboard.length) {
+      const columna = [...virtualChessboard[x]];
+      while (!kingFound && y < columna.length) {
+        if (columna[y].piece === 5 && columna[y].pieceLogic.direction === parseInt(turn)) {
+          kingFound = true;
+          kingX = x;
+          kingY = y;
+        }
+        y++;
+      }
+      y = 0;
+      x++;
+    }
+    console.log("KING POSITION: " + kingX + "  " + kingY);
+    x = 0;
+    y = 0;
+    initPiece = virtualChessboard[inix][iniy];
+    fiPiece = virtualChessboard[fix][fiy];
+    virtualChessboard[fix][fiy] = initPiece;
+    virtualChessboard[inix][iniy] = fiPiece;
+    console.log(virtualChessboard);
+    console.log("Initial X: " + inix + " Initial Y: " + iniy + " Fin X: " + fix + " Final Y: " + fiy);
+    while (x < virtualChessboard.length) {
+      const columna = [...virtualChessboard[x]];
+      while (y < columna.length) {
+        if (columna[y].piece !== 0 && columna[y].pieceLogic.direction !== parseInt(turn)) {
+          posiblesMoves = columna[y].pieceLogic.setPosiblesMovements(virtualChessboard, x, y);
+          if (posiblesMoves.length > 0) {
+            posiblesMoves.forEach(pm => {
+              if (pm[0] === kingX && pm[1] === kingY) {
+                console.log("KING POSITION: "+kingX+"  "+kingY+", Piece: "+columna[y].piece+", x: "+pm[0]+", y: "+pm[1]);
+                posibleKingDeath = true;
+              }
+            })
+            //columna[y].pieceLogic.posiblesMoves=[];
+          }
+        }
+        y++;
+      }
+      y = 0;
+      x++;
+    }
+    //const piecesColor = parseInt(turn);
+    //const versusPiecesColor = parseInt(turn) * -1;
+    //virtualChessboard[fix][fiy] = virtualChessboard[inix][iniy];
+    //virtualChessboard*/
+    return !posibleKingDeath;
+  }
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};
     switch (piece) {

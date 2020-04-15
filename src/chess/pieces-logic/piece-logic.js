@@ -10,7 +10,7 @@ export default class PieceLogic {
     this.y = y;
     this.direction = direction;
   }
-  outOfBounds(x, y) {
+  notOutOfBounds(x, y) {
     let notOut = false;
     if (x >= 0 && x < 8 && y >= 0 && y < 8) {
       notOut = true;
@@ -26,21 +26,26 @@ export default class PieceLogic {
     });
     return move;
   }
-  setPosiblesMovements(x, y) {
-    console.log(this.moves);
+  setPosiblesMovements(chessboard, x, y) {
+    //console.log(this.moves);
+    const posiblesMoves = [];
     this.moves.forEach(m =>{
       let xto = parseInt(x) + (m[0] * this.direction);
       let yto = parseInt(y) + (m[1] * this.direction);
-      while (this.outOfBounds(xto, yto) && this.chessboard[xto][yto].piece === 0){
-        this.posiblesMoves.push([xto, yto]);
+      while (this.notOutOfBounds(xto, yto) && chessboard[xto][yto].piece === 0){
+        posiblesMoves.push([xto, yto]);
         xto = parseInt(xto) + (m[0] * this.direction);
         yto = parseInt(yto) + (m[1] * this.direction);
       }
-      console.log(xto + "  " +yto);
-      if (this.outOfBounds(xto, yto) && this.chessboard[xto][yto].piece !== 0 && this.chessboard[xto][yto].pieceLogic.direction !== this.direction) {
-        this.posiblesMoves.push([xto, yto]);
+      //console.log(xto + "  " +yto);
+      if (this.notOutOfBounds(xto, yto) && chessboard[xto][yto].piece !== 0 && chessboard[xto][yto].pieceLogic.direction !== this.direction) {
+        if (chessboard[x][y].piece===4){
+          console.log("MOVIMENT PER MATAR: "+xto + "  " +yto);
+        }
+        posiblesMoves.push([xto, yto]);
       }
     })
-    console.log(this.posiblesMoves);
+    //console.log(this.posiblesMoves);
+    return posiblesMoves;
   }
 }

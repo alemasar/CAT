@@ -29,6 +29,7 @@ class ChessBoard extends HTMLElement {
   }
   constructor() {
     super();
+    this.devel = false;
     this.chessLogic = new ChessLogic();
     this.startPlayingConnection = {};
     this.inix = 0;
@@ -57,7 +58,6 @@ class ChessBoard extends HTMLElement {
     console.log(this.chessLogic.idGame);
     this.startPlayingConnection = this.chessLogic.listAllGames().doc(this.chessLogic.idGame).onSnapshot((doc)=>{
       const data = doc.data();
-
       if (data.moves.length>0){
         const move = data.moves.pop();
         console.log(typeof move.player+"    "+ typeof game.get("player"));
@@ -65,7 +65,7 @@ class ChessBoard extends HTMLElement {
           console.log("entro")
           this.move(move.inix, move.iniy, move.fix, move.fiy, move.player);
           this.turn = parseInt(this.turn) * -1;
-          this.turn = this.turn.toString()
+          this.turn = this.turn.toString();
           console.log("TURNO", this.turn);
           game.set("turn", this.turn);
         }
@@ -79,16 +79,16 @@ class ChessBoard extends HTMLElement {
   }
 
   async move(inix, iniy, fix, fiy, turn){
-    console.log(this.chessboard[inix][iniy].boxComponent.shadowRoot.querySelector(".chess-box *"));
+    //console.log(this.chessboard[inix][iniy].boxComponent.shadowRoot.querySelector(".chess-box *"));
     const piece = this.chessboard[inix][iniy].boxComponent.shadowRoot.querySelector(".chess-box *");
     const logic = this.chessboard[inix][iniy].pieceLogic;
-    console.log(fix+" "+fiy+"  "+this.chessboard[fix][fiy])
+    //console.log(fix+" "+fiy+"  "+this.chessboard[fix][fiy])
     if (this.chessboard[fix][fiy].piece !== 0) {
       const killpiece = this.chessboard[fix][fiy].boxComponent.shadowRoot.querySelector(".chess-box *");
       killpiece.parentNode.removeChild(killpiece);
     }
-    console.log(this.chessboard[fix][fiy].boxComponent.shadowRoot.querySelector(".chess-box"));
-    console.log(piece);
+    //console.log(this.chessboard[fix][fiy].boxComponent.shadowRoot.querySelector(".chess-box"));
+    //console.log(piece);
     
     this.chessboard[fix][fiy].boxComponent.shadowRoot.querySelector(".chess-box").appendChild(piece);
     this.chessboard[fix][fiy].pieceLogic = this.chessboard[inix][iniy].pieceLogic;
@@ -99,40 +99,69 @@ class ChessBoard extends HTMLElement {
     logic.posiblesMoves.splice(0, logic.posiblesMoves.length)
     this.chessboard[inix][iniy].boxComponent.unselectBox();
     this.chessboard[inix][iniy].pieceLogic = {};
+    if (this.chessboard[inix][iniy].piece === 1) {
+      this.chessboard[inix][iniy].pieceLogic.moved = true;
+    }
     this.chessboard[inix][iniy].piece = 0;
-    await this.chessLogic.setMovement(turn, inix, iniy, fix, fiy);
+    if (!this.devel){
+      await this.chessLogic.setMovement(turn, inix, iniy, fix, fiy);
+    } else {
+      this.player = parseInt(this.player) * -1;
+      this.player = this.player.toString();
+      //console.log("CAMBIO TURNO EN MOVE", this.player);
+      if (this.player === "-1"){
+        this.shadowRoot.querySelector(".user-turn").innerHTML="NEGRES";
+      } else {
+        this.shadowRoot.querySelector(".user-turn").innerHTML="BLANQUES";
+      }
+    }
     this.setAttribute("movement-status", 0);
   }
 
   async attributeChangedCallback(name, oldValue, newValue) {
-    console.log("MISMO JUGADOR: "+this.chessboard[this.inix][this.iniy].piece+"  "+this.inix);
+    /*console.log("newValue: "+newValue);
+    console.log("player: "+this.player);
+    console.log("turn: "+this.turn);*/
     if (name === "movement-status" && newValue !== -1 && this.player === this.turn) {
       if (newValue === "1") {
         if (this.chessboard[this.inix][this.iniy].pieceLogic.direction === parseInt(this.turn) && this.chessboard[this.inix][this.iniy].piece !== 0) {
-          console.log("MISMO JUGADOR: "+this.chessboard[this.inix][this.iniy].pieceLogic.direction+", "+ parseInt(this.turn));
+          //console.log("MISMO JUGADOR: "+this.chessboard[this.inix][this.iniy].pieceLogic.direction+", "+ parseInt(this.turn));
           this.setAttribute("movement-status", 2)
         } else {
-          console.log("DIFERENTE JUGADOR")
+          //console.log("DIFERENTE JUGADOR")
           this.setAttribute("movement-status", 0)
         }
       } else if (newValue === "2") {
         const logic = this.chessboard[this.inix][this.iniy].pieceLogic;
-        logic.setPosiblesMovements(this.inix, this.iniy);
+        logic.posiblesMoves = logic.setPosiblesMovements(this.chessboard, this.inix, this.iniy);
         if (logic.posiblesMoves.length > 0) {
           this.chessboard[this.inix][this.iniy].boxComponent.selectBox();
+          console.log(logic.posiblesMoves);
           logic.posiblesMoves.forEach(pm => {
             this.chessboard[pm[0]][pm[1]].boxComponent.setPosibleMovementBox();
           })
         }
       } else if (newValue === "3") {
-        console.log(this.fix + "  " + this.fiy);
+        console.log("Initial X: "+this.inix + " Initial Y: " + this.iniy+" Fin X: "+this.fix + " Final Y: " + this.fiy);
         const move = this.chessboard[this.inix][this.iniy].pieceLogic.checkMove(this.fix, this.fiy);
-        if (move) {
+
+        const checkAllMoves=this.chessLogic.checkAllMoves(this.inix, this.iniy, this.fix, this.fiy, this.turn);
+        console.log("Posibilitat rei no mort: ", checkAllMoves);
+        if (move && checkAllMoves) {
+          console.log(this.inix +", "+this.iniy+", "+this.fix+", "+this.fiy)
           this.move(this.inix, this.iniy, this.fix, this.fiy, this.turn);
           this.turn = parseInt(this.turn) * -1;
           this.turn = this.turn.toString()
-          console.log("TURNO", this.turn);
+          //console.log("CAMBIO TURNO", this.turn);
           game.set("turn", this.turn);
+        } else if(!checkAllMoves){
+          console.log("Puedo matar el rei");
+          const inilogic = this.chessboard[this.inix][this.iniy].pieceLogic;
+          this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
+          inilogic.posiblesMoves.forEach(pm => {
+            this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
+          });
+          this.setAttribute("movement-status", 0);
         } else {
           if (this.chessboard[this.fix][this.fiy].piece !== 0 && this.chessboard[this.fix][this.fiy].pieceLogic.direction === this.chessboard[this.inix][this.iniy].pieceLogic.direction) {
             const inilogic = this.chessboard[this.inix][this.iniy].pieceLogic;
@@ -141,7 +170,7 @@ class ChessBoard extends HTMLElement {
             inilogic.posiblesMoves.forEach(pm => {
               this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
             });
-            filogic.setPosiblesMovements(this.fix, this.fiy);
+            filogic.posiblesMoves = filogic.setPosiblesMovementssetPosiblesMovements(this.chessboard, this.fix, this.fiy);
             if (filogic.posiblesMoves.length > 0) {
               this.chessboard[this.fix][this.fiy].boxComponent.selectBox();
               filogic.posiblesMoves.forEach(pm => {
@@ -170,6 +199,16 @@ class ChessBoard extends HTMLElement {
   connectedCallback() {
     // this.addEventListener('click', this._onClick);
     this.setAttribute("movement-status", -1);
+    if (this.devel){
+      this.setAttribute("movement-status", 0);
+      game.set("player", "1");
+      this.player=game.get("player");
+      if (this.player === "-1"){
+        this.shadowRoot.querySelector(".user-turn").innerHTML="NEGRES";
+      } else {
+        this.shadowRoot.querySelector(".user-turn").innerHTML="BLANQUES";
+      }
+    }
     this.chessboard.forEach((x, ix) => {
       x.forEach((y, iy) => {
         this.chessboard[ix][iy].boxComponent.parent = this;
@@ -246,6 +285,8 @@ class ChessBoard extends HTMLElement {
         }
         this.chessboard[ix][iy].boxComponent.x = ix;
         this.chessboard[ix][iy].boxComponent.y = iy;
+        this.chessboard[ix][iy].boxComponent.setAttribute("x",ix);
+        this.chessboard[ix][iy].boxComponent.setAttribute("y",iy);
       });
     });
   }

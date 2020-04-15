@@ -37,11 +37,11 @@ class ChessBox extends HTMLElement {
 
   _onClick() {
     if (this.parent.getAttribute("movement-status") === "0"){
-      console.log("PASOOO")
       this.parent.inix = this.x;
       this.parent.iniy = this.y;
       this.parent.setAttribute("movement-status", 1);
     } else if (this.parent.getAttribute("movement-status") === "2"){
+      console.log("ChessBox: x"+this.x+", y: "+this.y);
       this.parent.fix = this.x;
       this.parent.fiy = this.y;
       this.parent.setAttribute("movement-status", 3);

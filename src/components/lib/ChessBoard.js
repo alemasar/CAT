@@ -144,16 +144,16 @@ class ChessBoard extends HTMLElement {
         console.log("Initial X: "+this.inix + " Initial Y: " + this.iniy+" Fin X: "+this.fix + " Final Y: " + this.fiy);
         const move = this.chessboard[this.inix][this.iniy].pieceLogic.checkMove(this.fix, this.fiy);
 
-        const checkAllMoves=this.chessLogic.checkAllMoves(this.inix, this.iniy, this.fix, this.fiy, this.turn);
-        console.log("Posibilitat rei no mort: ", checkAllMoves);
-        if (move && checkAllMoves) {
+        const checkPosibleKingDeath=this.chessLogic.checkPosibleKingDeath(this.inix, this.iniy, this.fix, this.fiy, this.turn);
+        console.log("Posibilitat rei no mort: ", checkPosibleKingDeath);
+        if (move && !checkPosibleKingDeath) {
           console.log(this.inix +", "+this.iniy+", "+this.fix+", "+this.fiy)
           this.move(this.inix, this.iniy, this.fix, this.fiy, this.turn);
           this.turn = parseInt(this.turn) * -1;
           this.turn = this.turn.toString()
           //console.log("CAMBIO TURNO", this.turn);
           game.set("turn", this.turn);
-        } else if(!checkAllMoves){
+        } else if(checkPosibleKingDeath){
           console.log("Puedo matar el rei");
           const inilogic = this.chessboard[this.inix][this.iniy].pieceLogic;
           this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
@@ -169,7 +169,7 @@ class ChessBoard extends HTMLElement {
             inilogic.posiblesMoves.forEach(pm => {
               this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
             });
-            filogic.posiblesMoves = filogic.setPosiblesMovementssetPosiblesMovements(this.chessboard, this.fix, this.fiy);
+            filogic.posiblesMoves = filogic.setPosiblesMovements(this.chessboard, this.fix, this.fiy);
             if (filogic.posiblesMoves.length > 0) {
               this.chessboard[this.fix][this.fiy].boxComponent.selectBox();
               filogic.posiblesMoves.forEach(pm => {

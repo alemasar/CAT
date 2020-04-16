@@ -81,26 +81,17 @@ export default class GameLogic {
     });
     return docRef;
   }
-  checkAllMoves(inix, iniy, fix, fiy, turn) {
-    let initPiece = {};
-    let fiPiece = {};
-    let posiblesMoves = [];
-    let virtualChessboard = [];
+
+  searchKing(kingChessboard, color){
     let x = 0;
     let y = 0;
     let kingX = 0;
     let kingY = 0;
     let kingFound = false;
-    let posibleKingDeath = false;
-    this.chessboard_pieces.forEach((fila) => {
-      virtualChessboard.push([...fila])
-    });
-    //console.log(virtualChessboard);
-
-    while (!kingFound && x < virtualChessboard.length) {
-      const columna = [...virtualChessboard[x]];
+    while (!kingFound && x < kingChessboard.length) {
+      const columna = [...kingChessboard[x]];
       while (!kingFound && y < columna.length) {
-        if (columna[y].piece === 5 && columna[y].pieceLogic.direction === parseInt(turn)) {
+        if (columna[y].piece === 5 && columna[y].pieceLogic.direction === color) {
           kingFound = true;
           kingX = x;
           kingY = y;
@@ -111,39 +102,62 @@ export default class GameLogic {
       x++;
     }
     console.log("KING POSITION: " + kingX + "  " + kingY);
-    x = 0;
-    y = 0;
-    initPiece = virtualChessboard[inix][iniy];
-    fiPiece = virtualChessboard[fix][fiy];
-    virtualChessboard[fix][fiy] = initPiece;
-    virtualChessboard[inix][iniy] = fiPiece;
-    console.log(virtualChessboard);
-    console.log("Initial X: " + inix + " Initial Y: " + iniy + " Fin X: " + fix + " Final Y: " + fiy);
-    while (x < virtualChessboard.length) {
-      const columna = [...virtualChessboard[x]];
-      while (y < columna.length) {
-        if (columna[y].piece !== 0 && columna[y].pieceLogic.direction !== parseInt(turn)) {
-          posiblesMoves = columna[y].pieceLogic.setPosiblesMovements(virtualChessboard, x, y);
-          if (posiblesMoves.length > 0) {
-            posiblesMoves.forEach(pm => {
-              if (pm[0] === kingX && pm[1] === kingY) {
-                console.log("KING POSITION: "+kingX+"  "+kingY+", Piece: "+columna[y].piece+", x: "+pm[0]+", y: "+pm[1]);
-                posibleKingDeath = true;
-              }
-            })
-            //columna[y].pieceLogic.posiblesMoves=[];
+    return {
+      kingX,
+      kingY,
+      kingFound
+    }
+  }
+
+  checkPosibleKingDeath(inix, iniy, fix, fiy, turn) {
+    let initPiece = {};
+    let fiPiece = {};
+    let posiblesMoves = [];
+    let virtualChessboard = [];
+    let posibleKingDeath = false;
+    let x = 0;
+    let y = 0;
+    const kingColor = parseInt(turn);
+    this.chessboard_pieces.forEach((fila) => {
+      virtualChessboard.push([...fila])
+    });
+    //console.log(virtualChessboard);
+    const king = this.searchKing(virtualChessboard, kingColor);
+
+    console.log("KING POSITION: " + king.kingX + "  " + king.kingY);
+    if (king.kingFound){
+      initPiece = virtualChessboard[inix][iniy];
+      fiPiece = virtualChessboard[fix][fiy];
+      virtualChessboard[fix][fiy] = initPiece;
+      virtualChessboard[inix][iniy] = fiPiece;
+      console.log(virtualChessboard);
+      console.log("Initial X: " + inix + " Initial Y: " + iniy + " Fin X: " + fix + " Final Y: " + fiy);
+      while (x < virtualChessboard.length) {
+        const columna = [...virtualChessboard[x]];
+        while (y < columna.length) {
+          if (columna[y].piece !== 0 && columna[y].pieceLogic.direction !== kingColor) {
+            posiblesMoves = columna[y].pieceLogic.setPosiblesMovements(virtualChessboard, x, y);
+            if (posiblesMoves.length > 0) {
+              posiblesMoves.forEach(pm => {
+                if (pm[0] === king.kingX && pm[1] === king.kingY) {
+                  console.log("KING POSITION: "+king.kingX+"  "+king.kingY+", Piece: "+columna[y].piece+", x: "+pm[0]+", y: "+pm[1]);
+                  posibleKingDeath = true;
+                }
+              })
+              //columna[y].pieceLogic.posiblesMoves=[];
+            }
           }
+          y++;
         }
-        y++;
+        y = 0;
+        x++;
       }
-      y = 0;
-      x++;
     }
     //const piecesColor = parseInt(turn);
     //const versusPiecesColor = parseInt(turn) * -1;
     //virtualChessboard[fix][fiy] = virtualChessboard[inix][iniy];
     //virtualChessboard*/
-    return !posibleKingDeath;
+    return posibleKingDeath;
   }
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};

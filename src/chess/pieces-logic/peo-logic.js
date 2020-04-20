@@ -16,7 +16,7 @@ export default class PeoLogic extends PieceLogic {
     if (this.notOutOfBounds(xto, yto) && chessboard[xto][yto].piece === 0) {
       posiblesMoves.push([xto, yto]);
     }
-    console.log(this.moved);
+
     if (this.moved === false && posiblesMoves.length > 0) {
       xto = parseInt(x) + (this.moves[1][0] * this.direction);
       yto = parseInt(y) + (this.moves[1][1] * this.direction);

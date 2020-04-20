@@ -39,9 +39,9 @@ export default class PieceLogic {
       }
       //console.log(xto + "  " +yto);
       if (this.notOutOfBounds(xto, yto) && chessboard[xto][yto].piece !== 0 && chessboard[xto][yto].pieceLogic.direction !== this.direction) {
-        if (chessboard[x][y].piece===4){
+        /*if (chessboard[x][y].piece===4){
           console.log("MOVIMENT PER MATAR: "+xto + "  " +yto);
-        }
+        }*/
         posiblesMoves.push([xto, yto]);
       }
     })

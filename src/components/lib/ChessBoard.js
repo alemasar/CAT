@@ -17,10 +17,11 @@ const template = document.createElement("template");
 
       </style>
       
-    <game-list></game-list>
+    <!--game-list></game-list-->
     <h1>TORN: <span class="user-turn"></span></h1>
     <div class="chess-board_container">
     </div>
+    <div class="chess-board_messages"></div>
   `;
 class ChessBoard extends HTMLElement {
   static get observedAttributes() {
@@ -28,7 +29,7 @@ class ChessBoard extends HTMLElement {
   }
   constructor() {
     super();
-    this.devel = false;
+    this.devel = true;
     this.chessLogic = new ChessLogic();
     this.startPlayingConnection = {};
     this.inix = 0;
@@ -81,6 +82,7 @@ class ChessBoard extends HTMLElement {
     //console.log(this.chessboard[inix][iniy].boxComponent.shadowRoot.querySelector(".chess-box *"));
     const piece = this.chessboard[inix][iniy].boxComponent.shadowRoot.querySelector(".chess-box *");
     const logic = this.chessboard[inix][iniy].pieceLogic;
+
     //console.log(fix+" "+fiy+"  "+this.chessboard[fix][fiy])
     if (this.chessboard[fix][fiy].piece !== 0) {
       const killpiece = this.chessboard[fix][fiy].boxComponent.shadowRoot.querySelector(".chess-box *");
@@ -92,6 +94,7 @@ class ChessBoard extends HTMLElement {
     this.chessboard[fix][fiy].boxComponent.shadowRoot.querySelector(".chess-box").appendChild(piece);
     this.chessboard[fix][fiy].pieceLogic = this.chessboard[inix][iniy].pieceLogic;
     this.chessboard[fix][fiy].piece = this.chessboard[inix][iniy].piece;
+    console.log(logic.posiblesMoves);
     logic.posiblesMoves.forEach(pm => {
       this.chessboard[pm[0]][pm[1]].boxComponent.unsetPosibleMovementBox();
     });
@@ -102,6 +105,7 @@ class ChessBoard extends HTMLElement {
       this.chessboard[inix][iniy].pieceLogic.moved = true;
     }
     this.chessboard[inix][iniy].piece = 0;
+
     if (!this.devel){
       await this.chessLogic.setMovement(turn, inix, iniy, fix, fiy);
     } else {
@@ -135,26 +139,33 @@ class ChessBoard extends HTMLElement {
         logic.posiblesMoves = logic.setPosiblesMovements(this.chessboard, this.inix, this.iniy);
         if (logic.posiblesMoves.length > 0) {
           this.chessboard[this.inix][this.iniy].boxComponent.selectBox();
-          console.log(logic.posiblesMoves);
+          //console.log(logic.posiblesMoves);
           logic.posiblesMoves.forEach(pm => {
             this.chessboard[pm[0]][pm[1]].boxComponent.setPosibleMovementBox();
           })
         }
       } else if (newValue === "3") {
-        console.log("Initial X: "+this.inix + " Initial Y: " + this.iniy+" Fin X: "+this.fix + " Final Y: " + this.fiy);
+       // console.log("Initial X: "+this.inix + " Initial Y: " + this.iniy+" Fin X: "+this.fix + " Final Y: " + this.fiy);
         const move = this.chessboard[this.inix][this.iniy].pieceLogic.checkMove(this.fix, this.fiy);
-
         const checkPosibleKingDeath=this.chessLogic.checkPosibleKingDeath(this.inix, this.iniy, this.fix, this.fiy, this.turn);
         console.log("Posibilitat rei no mort: ", checkPosibleKingDeath);
         if (move && !checkPosibleKingDeath) {
-          console.log(this.inix +", "+this.iniy+", "+this.fix+", "+this.fiy)
+          const jaque = this.chessLogic.checkPosibleKingDeath(this.inix, this.iniy, this.fix, this.fiy, parseInt(this.turn)*-1);
+          let jaqueMate = false;
+          //console.log(this.inix +", "+this.iniy+", "+this.fix+", "+this.fiy)
+          if (jaque){
+            this.shadowRoot.querySelector(".chess-board_messages").innerHTML="Jaque al rei";
+            jaqueMate = this.chessLogic.checkJaqueMate(this.inix, this.iniy, this.fix, this.fiy, parseInt(this.turn)*-1)
+            console.log("JAQUE MATE: ", jaqueMate);
+          }
           this.move(this.inix, this.iniy, this.fix, this.fiy, this.turn);
           this.turn = parseInt(this.turn) * -1;
-          this.turn = this.turn.toString()
+          this.turn = this.turn.toString();
           //console.log("CAMBIO TURNO", this.turn);
           game.set("turn", this.turn);
         } else if(checkPosibleKingDeath){
           console.log("Puedo matar el rei");
+          this.shadowRoot.querySelector(".chess-board_messages").innerHTML="Te pueden matar el rei";
           const inilogic = this.chessboard[this.inix][this.iniy].pieceLogic;
           this.chessboard[this.inix][this.iniy].boxComponent.unselectBox();
           inilogic.posiblesMoves.forEach(pm => {

@@ -41,7 +41,8 @@ export default class GameLogic {
     //    game.movementStatus = 0;
     game.set("movement-status", -1);
     game.set("player", 1);
-    //game.add("movementStatus", 0);  
+    //game.add("movementStatus", 0); 
+    console.log("NEW GAME LOGIC");
   }
 
   listAllGames() {
@@ -89,7 +90,7 @@ export default class GameLogic {
     let kingY = 0;
     let kingFound = false;
     while (!kingFound && x < kingChessboard.length) {
-      const columna = [...kingChessboard[x]];
+      const columna = kingChessboard[x];
       while (!kingFound && y < columna.length) {
         if (columna[y].piece === 5 && columna[y].pieceLogic.direction === color) {
           kingFound = true;
@@ -101,49 +102,44 @@ export default class GameLogic {
       y = 0;
       x++;
     }
-    console.log("KING POSITION: " + kingX + "  " + kingY);
+   // console.log("KING POSITION: " + kingX + "  " + kingY);
     return {
       kingX,
       kingY,
       kingFound
     }
   }
-
-  checkPosibleKingDeath(inix, iniy, fix, fiy, turn) {
+  searchKillerPieces(virtualChessboard, king, inix, iniy, fix, fiy, kingColor){
     let initPiece = {};
     let fiPiece = {};
     let posiblesMoves = [];
-    let virtualChessboard = [];
-    let posibleKingDeath = false;
     let x = 0;
     let y = 0;
-    const kingColor = parseInt(turn);
-    this.chessboard_pieces.forEach((fila) => {
-      virtualChessboard.push([...fila])
-    });
-    //console.log(virtualChessboard);
-    const king = this.searchKing(virtualChessboard, kingColor);
-
-    console.log("KING POSITION: " + king.kingX + "  " + king.kingY);
+    const killerPieces = [];
     if (king.kingFound){
       initPiece = virtualChessboard[inix][iniy];
       fiPiece = virtualChessboard[fix][fiy];
       virtualChessboard[fix][fiy] = initPiece;
       virtualChessboard[inix][iniy] = fiPiece;
-      console.log(virtualChessboard);
-      console.log("Initial X: " + inix + " Initial Y: " + iniy + " Fin X: " + fix + " Final Y: " + fiy);
       while (x < virtualChessboard.length) {
-        const columna = [...virtualChessboard[x]];
-        while (y < columna.length) {
-          if (columna[y].piece !== 0 && columna[y].pieceLogic.direction !== kingColor) {
-            posiblesMoves = columna[y].pieceLogic.setPosiblesMovements(virtualChessboard, x, y);
+        while (y < virtualChessboard[x].length) {
+          const columna = virtualChessboard[x][y];
+
+          if (columna.piece !== 0 && columna.pieceLogic.direction !== kingColor) {
+            posiblesMoves = columna.pieceLogic.setPosiblesMovements(virtualChessboard, x, y);
             if (posiblesMoves.length > 0) {
               posiblesMoves.forEach(pm => {
+                if (columna.piece===4){
+                  console.log("pm x: "+pm[0]+" pm y: "+pm[1]+" king.kingX "+king.kingX+" king.kingY "+king.kingY)
+                }
                 if (pm[0] === king.kingX && pm[1] === king.kingY) {
-                  console.log("KING POSITION: "+king.kingX+"  "+king.kingY+", Piece: "+columna[y].piece+", x: "+pm[0]+", y: "+pm[1]);
-                  posibleKingDeath = true;
+                  killerPieces.push(columna);
+                  //jaqueMate = true;
                 }
               })
+              if (killerPieces.length > 0){
+                columna.pieceLogic.posiblesMoves = posiblesMoves;
+              }
               //columna[y].pieceLogic.posiblesMoves=[];
             }
           }
@@ -153,12 +149,74 @@ export default class GameLogic {
         x++;
       }
     }
-    //const piecesColor = parseInt(turn);
-    //const versusPiecesColor = parseInt(turn) * -1;
-    //virtualChessboard[fix][fiy] = virtualChessboard[inix][iniy];
-    //virtualChessboard*/
+    return killerPieces;
+  }
+  copyChessBoard(){
+    let virtualChessboard = [];
+    this.chessboard_pieces.forEach((fila, xfila) => {
+      virtualChessboard[xfila]=[];
+      fila.forEach((columna) =>{
+        virtualChessboard[xfila].push({
+          piece: columna.piece,
+          pieceLogic: Object.assign(Object.create(Object.getPrototypeOf(columna.pieceLogic)), columna.pieceLogic)
+          //boxComponent: Object.assign({}, columna.boxComponent)
+        });
+      })
+    });
+    return virtualChessboard;
+  }
+  checkPosibleKingDeath(inix, iniy, fix, fiy, turn) {
+
+    let posibleKingDeath = false;
+    let king = {};
+    let killerPieces = [];
+    const kingColor = parseInt(turn);
+    const virtualChessboard = this.copyChessBoard();
+    console.log("checkPosibleKingDeath");
+    /*virtualChessboard[0][0].pieceLogic.posiblesMoves = 0;
+    console.log(virtualChessboard[0][0].pieceLogic.posiblesMoves);
+    console.log(this.chessboard_pieces[0][0].pieceLogic.posiblesMoves);*/
+    king = this.searchKing(virtualChessboard, kingColor);
+    killerPieces = this.searchKillerPieces(virtualChessboard, king, inix, iniy, fix, fiy, kingColor);
+    if (killerPieces.length > 0){
+      posibleKingDeath = true;
+    }
     return posibleKingDeath;
   }
+
+  checkJaqueMate(inix, iniy, fix, fiy, turn){
+    let jaqueMate = false;
+    let killerPieces = [];
+    let canMove = true;
+    let initPiece = {};
+    let fiPiece = {};
+    const kingColor = parseInt(turn);
+    const virtualChessboard = this.copyChessBoard();
+    const king = this.searchKing(virtualChessboard, kingColor);
+    const posiblesMoves = virtualChessboard[king.kingX][king.kingY].pieceLogic.setPosiblesMovements(virtualChessboard, king.kingX, king.kingY);
+    initPiece = virtualChessboard[inix][iniy];
+    fiPiece = virtualChessboard[fix][fiy];
+    virtualChessboard[fix][fiy] = initPiece;
+    virtualChessboard[inix][iniy] = fiPiece;
+    posiblesMoves.forEach(pm => {
+      console.log(pm)
+      killerPieces = this.searchKillerPieces(virtualChessboard, king, king.kingX, king.kingY, pm[0], pm[1], kingColor);
+      console.log("KILLER PIECES", killerPieces);
+      if (killerPieces.length > 0 && canMove) {
+        canMove = false;
+      }
+    })
+/*
+    if (killerPieces.length > 1) {
+      console.log("KING POSITION: " + king.kingX + "  " + king.kingY);
+    } else if (killerPieces.length === 1) {
+      console.log("KING POSITION: ", virtualChessboard[king.kingX][king.kingY]);
+
+    }*/
+
+    return jaqueMate;
+  }
+
   getPieceLogic(piece, x, y, direction) {
     let pieceLogic = {};
     switch (piece) {

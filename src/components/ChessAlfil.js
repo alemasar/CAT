@@ -1,3 +1,4 @@
+/* global template */
 <style>
   :host{
     display:flex;

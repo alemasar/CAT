@@ -1,10 +1,9 @@
 module.exports = {
-    "parser": "babel-eslint",
     "env": {
         "browser": true,
         "es6": true
     },
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended"],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
@@ -15,5 +14,7 @@ module.exports = {
         "allowImportExportEverywhere": true
     },
     "rules": {
-    }
+    },
+    "plugins": ["cat-file", "html"],
+    "processor": "cat-file/cat-file"
 };

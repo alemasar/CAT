@@ -102,7 +102,7 @@ export default class GameLogic {
       y = 0;
       x++;
     }
-   // console.log("KING POSITION: " + kingX + "  " + kingY);
+    console.log("KING POSITION: " + kingX + "  " + kingY);
     return {
       kingX,
       kingY,
@@ -124,14 +124,10 @@ export default class GameLogic {
       while (x < virtualChessboard.length) {
         while (y < virtualChessboard[x].length) {
           const columna = virtualChessboard[x][y];
-
           if (columna.piece !== 0 && columna.pieceLogic.direction !== kingColor) {
             posiblesMoves = columna.pieceLogic.setPosiblesMovements(virtualChessboard, x, y);
             if (posiblesMoves.length > 0) {
               posiblesMoves.forEach(pm => {
-                if (columna.piece===4){
-                  console.log("pm x: "+pm[0]+" pm y: "+pm[1]+" king.kingX "+king.kingX+" king.kingY "+king.kingY)
-                }
                 if (pm[0] === king.kingX && pm[1] === king.kingY) {
                   killerPieces.push(columna);
                   //jaqueMate = true;
@@ -183,29 +179,71 @@ export default class GameLogic {
     }
     return posibleKingDeath;
   }
+  
+  searchOpponentPieces(virtualChessboard, direction){
+    const opponentPieces = [];
+    virtualChessboard.forEach((fila) => {
+      fila.forEach((columna)=>{
+        if (columna.piece!==0 && columna.pieceLogic.direction === direction){
+          opponentPieces.push(Object.assign({}, columna));
+        }
+      });
+    });
+    return opponentPieces;
+  }
 
   checkJaqueMate(inix, iniy, fix, fiy, turn){
-    let jaqueMate = false;
+    let jaqueMate = true;
+    let kingCanMove = true;
     let killerPieces = [];
-    let canMove = true;
-    let initPiece = {};
-    let fiPiece = {};
+    //const posibleKingMove = [];
+    //let canMove = true;
+    let killMoves = [];
     const kingColor = parseInt(turn);
     const virtualChessboard = this.copyChessBoard();
     const king = this.searchKing(virtualChessboard, kingColor);
     const posiblesMoves = virtualChessboard[king.kingX][king.kingY].pieceLogic.setPosiblesMovements(virtualChessboard, king.kingX, king.kingY);
-    initPiece = virtualChessboard[inix][iniy];
-    fiPiece = virtualChessboard[fix][fiy];
-    virtualChessboard[fix][fiy] = initPiece;
-    virtualChessboard[inix][iniy] = fiPiece;
-    posiblesMoves.forEach(pm => {
-      console.log(pm)
-      killerPieces = this.searchKillerPieces(virtualChessboard, king, king.kingX, king.kingY, pm[0], pm[1], kingColor);
-      console.log("KILLER PIECES", killerPieces);
-      if (killerPieces.length > 0 && canMove) {
-        canMove = false;
+    console.log(posiblesMoves);
+    if (posiblesMoves.length > 0){
+      const kingPosibleMove = Object.assign({}, king);
+      posiblesMoves.forEach(pm => {
+        let killerMovePiece = [];
+        kingPosibleMove.kingX = pm[0];
+        kingPosibleMove.kingY = pm[1];
+        killerMovePiece = this.searchKillerPieces(virtualChessboard, kingPosibleMove, inix, iniy, fix, fiy, kingColor);
+        if (killerMovePiece.length > 0) {
+          console.log(killerMovePiece);
+          killerMovePiece.forEach(kmp =>{
+            killerPieces.push(kmp);
+          })
+        }
+      });
+      if (killerPieces.length > 0){
+        killerPieces.forEach((piece)=>{
+          killMoves = piece.pieceLogic.checkKillKingMoves(virtualChessboard, inix, iniy, fix, fiy, king.kingX, king.kingY);
+          if (killMoves.length > 0) {
+            const opponentPieces = this.searchOpponentPieces(virtualChessboard, kingColor);
+            opponentPieces.forEach(piece => {
+              const moves = piece.pieceLogic.setPosiblesMovements(virtualChessboard, piece.pieceLogic.x, piece.pieceLogic.y);
+              if (moves.length > 0){
+                killMoves.forEach(move =>{
+                  const moveOpponentsPieces = moves.filter(m => move[0]===m[0] && move[1]===m[1]);
+                  if (moveOpponentsPieces.length>0){
+                    jaqueMate = false;
+                  }
+                })
+              }
+            })
+          }
+          console.log("MOVIMIENTOS QUE MATAN AL REY",killMoves);
+        })
+        if (killerPieces.length === posiblesMoves.length){
+          console.log("EL REI NO SE PUEDE MOVER", kingCanMove);
+          //kingCanMove = false;
+        }
       }
-    })
+    }
+    console.log("JAQUE MATE", jaqueMate);
 /*
     if (killerPieces.length > 1) {
       console.log("KING POSITION: " + king.kingX + "  " + king.kingY);

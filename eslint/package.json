@@ -1,0 +1,19 @@
+{
+  "name": "eslint-plugin-cat-file",
+  "version": "1.0.6",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "processor.js"
+  ],
+  "dependencies": {
+    "requireindex": "~1.1.0"
+  },
+  "devDependencies": {
+    "eslint": "~3.9.1",
+    "mocha": "^3.1.2"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  }
+}
